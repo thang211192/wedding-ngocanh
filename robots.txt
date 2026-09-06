@@ -1,0 +1,116 @@
+# =============================================================================
+# Trang riêng tư — không muốn xuất hiện trên công cụ tìm kiếm,
+# và không muốn bị thu thập làm dữ liệu huấn luyện AI.
+#
+# LƯU Ý QUAN TRỌNG về cách viết file này:
+# Không chặn Googlebot / Bingbot bằng "Disallow: /" ở đây. Nếu chặn, chúng
+# không tải được trang, nên không đọc được thẻ <meta name="robots"
+# content="noindex"> — và URL vẫn có thể bị liệt kê trong kết quả tìm kiếm
+# (dạng chỉ có link, không mô tả). Tệ hơn: nếu trang đã lỡ bị lập chỉ mục,
+# Google sẽ không bao giờ quay lại đọc được lệnh noindex để gỡ ra.
+# Cách đúng: cho chúng vào đọc, thấy noindex rồi tự loại trang khỏi chỉ mục.
+# =============================================================================
+
+# --- Bot tìm kiếm: cho vào để đọc được lệnh noindex ---
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Coccocbot
+Allow: /
+
+# --- Bot thu thập dữ liệu huấn luyện AI ---
+# Những bot này không hiểu lệnh noindex, chỉ tuân robots.txt, nên chặn thẳng.
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Perplexity-User
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: YouBot
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+# --- Bot lưu trữ ---
+# Chặn để trang không bị chụp lại vĩnh viễn trên các kho lưu trữ web.
+
+User-agent: archive.org_bot
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: Wayback
+Disallow: /
+
+# --- Mọi bot còn lại ---
+User-agent: *
+Disallow: /

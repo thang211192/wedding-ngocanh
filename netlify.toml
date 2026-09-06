@@ -17,7 +17,8 @@
   base = ""
 
   # Chỉ chép đúng những gì cần công khai.
-  command = "rm -rf _site && mkdir -p _site && cp index.html _site/ && cp -r assets _site/"
+  # Thêm file nào cần lên web thì phải thêm vào đây, nếu không nó sẽ không được deploy.
+  command = "rm -rf _site && mkdir -p _site && cp index.html robots.txt _site/ && cp -r assets _site/"
 
   # Thư mục được đẩy lên CDN.
   publish = "_site"
@@ -48,5 +49,11 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     # Không cho trang bị nhúng trong iframe của site khác.
     X-Frame-Options = "SAMEORIGIN"
-    # Trang riêng tư: yêu cầu công cụ tìm kiếm không lập chỉ mục.
-    X-Robots-Tag = "noindex, nofollow"
+    # Trang riêng tư. Header này mạnh hơn thẻ meta vì áp cho MỌI file,
+    # kể cả ảnh, CSS, JS và PDF — thẻ meta chỉ áp được cho file HTML.
+    #   noindex      : không đưa vào chỉ mục tìm kiếm
+    #   nofollow     : không đi theo các link trên trang
+    #   noarchive    : không lưu bản cache để người khác xem lại
+    #   nosnippet    : không hiển thị đoạn trích nội dung
+    #   noimageindex : không lập chỉ mục ảnh trong trang
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex"
