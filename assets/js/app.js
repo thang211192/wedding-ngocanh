@@ -164,8 +164,21 @@
         en.target.classList.add('is-in');
         obs.unobserve(en.target);
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+    }, { rootMargin: '0px 0px -4% 0px', threshold: .01 });
     items.forEach(function (el) { io.observe(el); });
+
+    // Lưới an toàn: nếu vì lý do nào đó IntersectionObserver không kích hoạt
+    // (mở trang bằng link có #hash, trình duyệt lạ...), vẫn hiện mọi thứ đã cuộn qua.
+    setTimeout(function () {
+      items.forEach(function (el) {
+        if (el.classList.contains('is-in')) return;
+        if (el.getBoundingClientRect().top < window.innerHeight) {
+          el.style.transitionDelay = '0ms';
+          el.classList.add('is-in');
+          io.unobserve(el);
+        }
+      });
+    }, 1500);
   }
 
   /* ---------------- 5. Ngày cưới → countdown + lộ trình ---------------- */
@@ -205,10 +218,10 @@
         alertEl.querySelector('span').innerHTML = '<strong>Chúc mừng hai bạn!</strong> Phần “Sau cưới” bên dưới còn vài việc cần hoàn tất.';
       } else if (weeks <= 8) {
         alertEl.className = 'note note--danger';
-        alertEl.querySelector('span').innerHTML = '<strong>Còn ' + weeks + ' tuần — rất gấp.</strong> Ưu tiên tuyệt đối 3 việc có thời gian chờ dài: đặt cọc nhà hàng, đặt lịch chụp ảnh cưới, in thiệp. Các việc khác có thể chạy song song.';
+        alertEl.querySelector('span').innerHTML = '<strong>Còn ' + weeks + ' tuần — rất gấp.</strong> Ưu tiên tuyệt đối 3 việc có thời gian chờ dài: đặt đội nấu cỗ, đặt dịch vụ rạp, đặt lịch chụp ảnh cưới. Các việc khác có thể chạy song song.';
       } else if (weeks <= 20) {
         alertEl.className = 'note note--gold';
-        alertEl.querySelector('span').innerHTML = '<strong>Còn ' + weeks + ' tuần.</strong> Đây là lộ trình nén — cần chốt nhà hàng và studio ảnh cưới ngay trong 2 tuần đầu vì cuối năm là cao điểm mùa cưới, dễ hết chỗ.';
+        alertEl.querySelector('span').innerHTML = '<strong>Còn ' + weeks + ' tuần.</strong> Đây là lộ trình nén — cần chốt đội nấu cỗ, dịch vụ rạp và studio ảnh cưới ngay trong 2 tuần đầu — chính vụ cưới cuối năm, đội có tiếng kín lịch rất sớm.';
       } else {
         alertEl.className = 'note note--rose';
         alertEl.querySelector('span').innerHTML = '<strong>Còn ' + weeks + ' tuần.</strong> Thời gian khá thong thả, bám theo mốc từng giai đoạn bên dưới là đủ.';
@@ -358,6 +371,70 @@
   }
 
   var budgetTier = 2;
+  var CO_IDS = ['mamTrai', 'mamGai', 'nguoiMam', 'giaMam'];
+  var guestTotal = 0;
+
+  function numOf(id) {
+    var el = document.getElementById(id);
+    return parseFloat(el && el.value) || 0;
+  }
+
+  function setRowValue(key, value) {
+    var row = $('tr[data-key="' + key + '"]');
+    if (!row) return;
+    var input = $('.money-input', row);
+    if (input) input.value = Math.round(value * 10) / 10;
+  }
+
+  /** Máy tính cỗ: số mâm × đơn giá → ghi thẳng vào 2 dòng cỗ trong bảng. */
+  function syncCo() {
+    var mamTrai = numOf('mamTrai');
+    var mamGai = numOf('mamGai');
+    var nguoiMam = numOf('nguoiMam');
+    var giaMam = numOf('giaMam');
+
+    var coTrai = mamTrai * giaMam;
+    var coGai = mamGai * giaMam;
+    guestTotal = (mamTrai + mamGai) * nguoiMam;
+
+    setRowValue('tiec-trai', coTrai);
+    setRowValue('tiec-gai', coGai);
+
+    var set = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+    set('coTrai', mil(coTrai));
+    set('coGai', mil(coGai));
+    set('coMam', nfInt.format(mamTrai + mamGai) + ' mâm');
+    set('coKhach', nfInt.format(guestTotal) + ' khách');
+    set('sumGuests', nfInt.format(guestTotal) + ' khách');
+  }
+
+  function applyTierCo(tier) {
+    CO_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = el.getAttribute('data-t' + tier);
+      if (v !== null) el.value = v;
+    });
+  }
+
+  function saveCo() {
+    var out = {};
+    CO_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) out[id] = el.value;
+    });
+    store.set('co', out);
+  }
+
+  function loadCo() {
+    var saved = store.get('co', null);
+    if (!saved) return false;
+    CO_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && saved[id] !== undefined) el.value = saved[id];
+    });
+    return true;
+  }
 
   /**
    * Nạp giá gợi ý của một mức vào bảng.
@@ -373,11 +450,13 @@
       var v = row.getAttribute('data-t' + tier);
       if (v !== null) input.value = v;
     });
+    applyTierCo(tier);
+    syncCo(); // hai dòng cỗ luôn khớp với máy tính cỗ, không lấy giá cứng
     store.set('budgetTier', tier);
     $$('.seg__btn[data-tier]').forEach(function (b) {
       b.setAttribute('aria-pressed', String(+b.getAttribute('data-tier') === tier));
     });
-    if (fromUser) saveCustom();
+    if (fromUser) { saveCo(); saveCustom(); }
   }
 
   function saveCustom() {
@@ -428,9 +507,9 @@
     byCat['du-phong'] = buffer;
     var total = subtotal + buffer;
 
-    var guests = parseFloat(($('#guestCount') || {}).value) || 0;
+    // Số khách lấy từ máy tính cỗ: (mâm nhà trai + mâm nhà gái) × người mỗi mâm
     var perGuest = parseFloat(($('#giftPerGuest') || {}).value) || 0;
-    var income = (guests * perGuest) / 1000; // perGuest nhập theo nghìn đồng → ra triệu
+    var income = (guestTotal * perGuest) / 1000; // perGuest nhập theo nghìn đồng → ra triệu
     var net = total - income;
 
     var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
@@ -514,7 +593,16 @@
     });
 
     applyTier(savedTier, false);
+    loadCo();
     loadCustom();
+    syncCo(); // chạy sau loadCustom: máy tính cỗ luôn là nguồn đúng cho 2 dòng cỗ
+
+    CO_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', function () { syncCo(); renderBudget(); });
+      el.addEventListener('change', function () { saveCo(); saveCustom(); });
+    });
 
     rows.forEach(function (row) {
       var input = $('.money-input', row);
@@ -532,7 +620,7 @@
       }
     });
 
-    ['bufferPct', 'guestCount', 'giftPerGuest'].forEach(function (id) {
+    ['bufferPct', 'giftPerGuest'].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       var saved = store.get('b_' + id, null);
@@ -548,6 +636,7 @@
       resetBtn.addEventListener('click', function () {
         if (!window.confirm('Đưa bảng chi phí về giá trị gốc của mức đang chọn?')) return;
         store.del('budgetCustom');
+        store.del('co');
         rows.forEach(function (row) {
           row.setAttribute('data-off', 'false');
           var cb = $('input[type="checkbox"]', row);
