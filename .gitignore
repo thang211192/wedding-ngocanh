@@ -1,0 +1,16 @@
+# Thư mục làm việc của công cụ
+.remember/
+.playwright-mcp/
+
+# Ảnh chụp màn hình tạm
+*-screenshot.png
+page-*.png
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
