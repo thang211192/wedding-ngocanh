@@ -14,3 +14,6 @@ Desktop.ini
 # Editor
 .vscode/
 .idea/
+
+# Thư mục publish do Netlify tạo khi build
+_site/

@@ -1,0 +1,52 @@
+# =============================================================================
+# Cấu hình deploy Netlify — trang lộ trình cưới Thắng & Ngọc Anh
+#
+# Đây là site tĩnh: chỉ cần index.html và assets/. Không dùng framework.
+#
+# Vì sao không publish thẳng gốc repo (publish = "."):
+#   Repo còn chứa docs/nhat-ky-tinh-yeu.md là ghi chép cá nhân, và README.md.
+#   Publish gốc repo sẽ đẩy cả hai file đó lên CDN công khai — ai có link đều
+#   đọc được, kể cả khi repo GitHub để private.
+#   Vì vậy build chỉ chép index.html + assets/ sang _site/ rồi publish _site/.
+#   Cách này đảm bảo file cá nhân KHÔNG BAO GIỜ rời khỏi repo.
+# =============================================================================
+
+[build]
+  # Thư mục làm việc, tính từ gốc repo. Rỗng = gốc repo.
+  # Dòng này ghi đè trường "Base directory" trên giao diện Netlify.
+  base = ""
+
+  # Chỉ chép đúng những gì cần công khai.
+  command = "rm -rf _site && mkdir -p _site && cp index.html _site/ && cp -r assets _site/"
+
+  # Thư mục được đẩy lên CDN.
+  publish = "_site"
+
+# --- Chặn dự phòng ---------------------------------------------------------
+# Build ở trên đã đủ để file cá nhân không lên CDN. Hai luật dưới đây là lớp
+# thứ hai, phòng khi có ai đổi publish về "." trong tương lai.
+# force = true để luật thắng cả khi file thật sự tồn tại ở đường dẫn đó.
+
+[[redirects]]
+  from = "/docs/*"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# --- Header bảo mật cơ bản -------------------------------------------------
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Không cho trang bị nhúng trong iframe của site khác.
+    X-Frame-Options = "SAMEORIGIN"
+    # Trang riêng tư: yêu cầu công cụ tìm kiếm không lập chỉ mục.
+    X-Robots-Tag = "noindex, nofollow"
