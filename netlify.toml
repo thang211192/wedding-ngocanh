@@ -11,6 +11,12 @@
 #   Cách này đảm bảo file cá nhân KHÔNG BAO GIỜ rời khỏi repo.
 # =============================================================================
 
+[build.environment]
+  # Repo có package.json (Playwright cho bộ test) nên Netlify sẽ tự chạy npm
+  # install trước lệnh build. Bỏ devDependencies đi cho nhanh — deploy chỉ cần
+  # copy file tĩnh, không cần trình duyệt test.
+  NPM_FLAGS = "--omit=dev"
+
 [build]
   # Thư mục làm việc, tính từ gốc repo. Rỗng = gốc repo.
   # Dòng này ghi đè trường "Base directory" trên giao diện Netlify.
@@ -18,7 +24,7 @@
 
   # Chỉ chép đúng những gì cần công khai.
   # Thêm file nào cần lên web thì phải thêm vào đây, nếu không nó sẽ không được deploy.
-  command = "rm -rf _site && mkdir -p _site && cp index.html robots.txt _site/ && cp -r assets _site/"
+  command = "rm -rf _site && mkdir -p _site && cp index.html an-uong.html robots.txt _site/ && cp -r assets _site/"
 
   # Thư mục được đẩy lên CDN.
   publish = "_site"

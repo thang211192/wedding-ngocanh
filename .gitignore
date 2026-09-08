@@ -2,6 +2,10 @@
 .remember/
 .playwright-mcp/
 
+# Phụ thuộc dev (Playwright cho bộ test). Không cần cho deploy.
+node_modules/
+test-results/
+
 # Ảnh chụp màn hình tạm
 *-screenshot.png
 page-*.png

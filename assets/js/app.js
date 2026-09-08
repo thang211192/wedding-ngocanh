@@ -40,6 +40,13 @@
   function mil(n) { return nf1.format(n) + ' tr'; }
   function vnd(nMillion) { return nfInt.format(Math.round(nMillion * 1e6)) + ' ₫'; }
 
+  /** Bỏ dấu tiếng Việt + hạ chữ thường, dùng cho ô tìm quán ăn. */
+  function noAccent(s) {
+    s = String(s || '').toLowerCase();
+    if (!String.prototype.normalize) return s;
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+  }
+
   var DOW = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 
   function parseISO(s) {
@@ -681,7 +688,168 @@
     renderTrap(store.get('trap', 7));
   }
 
-  /* ---------------- 9. Tiện ích khác ---------------- */
+  /* ---------------- 9. Ăn uống Hà Nội ---------------- */
+  function initEats() {
+    var cards = $$('.eat');
+    if (!cards.length) return;
+
+    var groups   = $$('.eat-group');
+    var areaBtns = $$('[data-area-f]');
+    var kindBtns = $$('[data-kind-f]');
+    var searchEl = $('#eatSearch');
+    var countEl  = $('#eatCount');
+    var emptyEl  = $('#eatEmpty');
+    var savedBtn = $('#eatSavedOnly');
+    var savedNEl = $('#eatSavedN');
+    var resetBtn = $('#eatReset');
+
+    var state = { area: 'all', kind: 'all', q: '', savedOnly: false };
+
+    var saved = store.get('eats', []);
+    if (!Array.isArray(saved)) saved = [];
+
+    // Chuỗi tìm kiếm bỏ dấu, tính sẵn một lần cho mỗi thẻ.
+    cards.forEach(function (c) { c.setAttribute('data-hay', noAccent(c.textContent)); });
+
+    function isSaved(id) { return saved.indexOf(id) !== -1; }
+
+    function renderSaved() {
+      cards.forEach(function (c) {
+        var on = isSaved(c.getAttribute('data-id'));
+        var btn = $('.eat__save', c);
+        c.setAttribute('data-saved', on ? 'true' : 'false');
+        if (!btn) return;
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        var lab = $('span', btn);
+        if (lab) lab.textContent = on ? 'Đã lưu' : 'Muốn đi';
+      });
+      if (savedNEl) savedNEl.textContent = saved.length;
+      if (savedBtn && !saved.length && state.savedOnly) {
+        state.savedOnly = false;
+        savedBtn.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    function apply() {
+      var q = noAccent(state.q).trim();
+      var shown = 0;
+
+      cards.forEach(function (c) {
+        var kinds = ',' + c.getAttribute('data-kind') + ',';
+        var ok =
+          (state.area === 'all' || c.getAttribute('data-area') === state.area) &&
+          (state.kind === 'all' || kinds.indexOf(',' + state.kind + ',') !== -1) &&
+          (!state.savedOnly || isSaved(c.getAttribute('data-id'))) &&
+          (!q || c.getAttribute('data-hay').indexOf(q) !== -1);
+        c.hidden = !ok;
+        if (ok) shown++;
+      });
+
+      groups.forEach(function (g) {
+        var any = $$('.eat', g).some(function (c) { return !c.hidden; });
+        g.hidden = !any;
+      });
+
+      if (countEl) {
+        countEl.textContent = shown === cards.length
+          ? 'Đang hiện toàn bộ ' + cards.length + ' quán.'
+          : 'Đang hiện ' + shown + ' / ' + cards.length + ' quán.';
+      }
+      if (emptyEl) emptyEl.hidden = shown !== 0;
+    }
+
+    function press(list, attr, val) {
+      list.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute(attr) === val));
+      });
+    }
+
+    areaBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.area = b.getAttribute('data-area-f');
+        press(areaBtns, 'data-area-f', state.area);
+        apply();
+      });
+    });
+
+    kindBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.kind = b.getAttribute('data-kind-f');
+        press(kindBtns, 'data-kind-f', state.kind);
+        apply();
+      });
+    });
+
+    if (searchEl) {
+      searchEl.addEventListener('input', function () {
+        state.q = searchEl.value || '';
+        apply();
+      });
+    }
+
+    if (savedBtn) {
+      savedBtn.addEventListener('click', function () {
+        if (!saved.length && !state.savedOnly) {
+          toast('Chưa lưu quán nào. Bấm “Muốn đi” ở thẻ quán để lưu lại.');
+          return;
+        }
+        state.savedOnly = !state.savedOnly;
+        savedBtn.setAttribute('aria-pressed', String(state.savedOnly));
+        apply();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        state.area = 'all';
+        state.kind = 'all';
+        state.q = '';
+        state.savedOnly = false;
+        if (searchEl) searchEl.value = '';
+        if (savedBtn) savedBtn.setAttribute('aria-pressed', 'false');
+        press(areaBtns, 'data-area-f', 'all');
+        press(kindBtns, 'data-kind-f', 'all');
+        apply();
+      });
+    }
+
+    var resetEatsBtn = $('#resetEats');
+    if (resetEatsBtn) {
+      resetEatsBtn.addEventListener('click', function () {
+        if (!saved.length) { toast('Chưa lưu quán nào.'); return; }
+        if (!window.confirm('Xoá danh sách quán đã lưu (' + saved.length + ' quán)?')) return;
+        saved.length = 0;
+        store.set('eats', saved);
+        renderSaved();
+        apply();
+        toast('Đã xoá danh sách quán đã lưu.');
+      });
+    }
+
+    cards.forEach(function (c) {
+      var btn = $('.eat__save', c);
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var id = c.getAttribute('data-id');
+        var i = saved.indexOf(id);
+        var name = $('.eat__name', c);
+        if (i === -1) {
+          saved.push(id);
+          toast('Đã lưu “' + (name ? name.textContent : 'quán này') + '” vào danh sách muốn đi.');
+        } else {
+          saved.splice(i, 1);
+        }
+        store.set('eats', saved);
+        renderSaved();
+        if (state.savedOnly) apply();
+      });
+    });
+
+    renderSaved();
+    apply();
+  }
+
+  /* ---------------- 10. Tiện ích khác ---------------- */
   function initMisc() {
     var printBtn = $('#printBtn');
     if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
@@ -689,7 +857,7 @@
     var resetAll = $('#resetAll');
     if (resetAll) {
       resetAll.addEventListener('click', function () {
-        if (!window.confirm('Xoá toàn bộ dữ liệu đã lưu trên trình duyệt này (checklist, ngân sách, ngày cưới)?')) return;
+        if (!window.confirm('Xoá toàn bộ dữ liệu đã lưu trên trình duyệt này (checklist, ngân sách, ngày cưới, danh sách quán muốn đi)?')) return;
         store.clearAll();
         window.location.reload();
       });
@@ -717,6 +885,7 @@
     initChecklist();
     initBudget();
     initTrap();
+    initEats();
     initReveal();
     initMisc();
 
