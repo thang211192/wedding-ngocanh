@@ -849,6 +849,63 @@
     apply();
   }
 
+  function initDatePlans() {
+    var routes = $$('[data-route]');
+    if (!routes.length) return;
+    var dates = store.get('dates', {});
+    if (!dates || typeof dates !== 'object' || Array.isArray(dates)) dates = {};
+    function summary() {
+      var n = routes.filter(function (r) { return dates[r.dataset.route]; }).length;
+      $('#dateSummary').textContent = n ? 'Đã lưu ' + n + ' buổi hẹn trên trình duyệt này · chưa đặt bàn.' : 'Chọn ngày để lưu buổi hẹn trên trình duyệt này. Tải lịch để thêm vào ứng dụng lịch của bạn.';
+    }
+    function escapeICS(s) { return s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
+    function fold(s) {
+      var lines = [], line = '', bytes = 0;
+      Array.from(s).forEach(function (c) {
+        var size = new TextEncoder().encode(c).length;
+        if (bytes + size > 73) { lines.push(line); line = ' '; bytes = 1; }
+        line += c; bytes += size;
+      });
+      lines.push(line); return lines.join('\r\n');
+    }
+    routes.forEach(function (r) {
+      var id = r.dataset.route, form = $('.date-plan', r), input = $('input', form), status = $('[role="status"]', form), remove = $('[data-remove-date]', form);
+      var savedDate = dates[id];
+      if (typeof savedDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(savedDate)) input.value = savedDate;
+      function render() {
+        remove.hidden = !dates[id];
+        status.textContent = dates[id] ? 'Đã lưu ngày ' + dates[id].split('-').reverse().join('/') + ' · chưa đặt bàn.' : 'Lịch gợi ý · chưa đặt bàn.';
+        r.dataset.planned = dates[id] ? 'true' : 'false';
+        summary();
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        dates[id] = input.value;
+        if (!store.set('dates', dates)) { delete dates[id]; render(); status.textContent = 'Không lưu được trên trình duyệt này. Bạn có thể tải lịch .ics.'; return; }
+        render();
+      });
+      remove.addEventListener('click', function () { delete dates[id]; store.set('dates', dates); input.value = ''; render(); });
+      $('[data-calendar]', form).addEventListener('click', function () {
+        if (!form.reportValidity()) return;
+        var title = $('.card__title', r).textContent;
+        var times = $$('.route__t', r).map(function (e) { return e.textContent.trim().padStart(5, '0'); });
+        function stamp(t) { return new Date(input.value + 'T' + t + ':00+07:00').toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'); }
+        var end = new Date(input.value + 'T' + times[times.length - 1] + ':00+07:00');
+        end.setMinutes(end.getMinutes() + 30);
+        var description = $('.route__meta', r).textContent + '\nLịch gợi ý, chưa đặt bàn. Giờ Hà Nội.\n' + $$('.route__list li', r).map(function (li) { return $('.route__t', li).textContent + ' ' + $('.route__h', li).textContent + ': ' + $('.route__d', li).textContent; }).join('\n');
+        var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Thang Ngoc Anh//Buoi hen//VI', 'BEGIN:VEVENT', 'UID:' + id + '-' + input.value + '@wedding-ngocanh.local', 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'), 'DTSTART:' + stamp(times[0]), 'DTEND:' + end.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'), 'SUMMARY:' + escapeICS(title), 'DESCRIPTION:' + escapeICS(description), 'END:VEVENT', 'END:VCALENDAR'];
+        var url = URL.createObjectURL(new Blob([lines.map(fold).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' }));
+        var a = document.createElement('a'); a.href = url; a.download = id + '-' + input.value + '.ics'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        status.textContent = 'Đã tạo tệp lịch theo giờ Hà Nội · chưa đặt bàn.';
+      });
+      render();
+    });
+    // Featured links must still work after filtering the directory.
+    $$('.featured-place').forEach(function (a) { a.addEventListener('click', function () { $('#eatReset').click(); }); });
+  }
+
   /* ---------------- 10. Tiện ích khác ---------------- */
   function initMisc() {
     var printBtn = $('#printBtn');
@@ -886,6 +943,7 @@
     initBudget();
     initTrap();
     initEats();
+    initDatePlans();
     initReveal();
     initMisc();
 

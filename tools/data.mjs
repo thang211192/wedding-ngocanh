@@ -1,3 +1,4 @@
+import { NEW_PLACES, NEW_ROUTES } from './dining-upgrade.mjs';
 // Dữ liệu trang "Ăn gì ở Hà Nội". Sửa file này rồi chạy `npm run build`.
 //
 // Mọi giá trị ở đây là VĂN BẢN THÔ — không nhúng thẻ HTML, không tự escape.
@@ -112,6 +113,7 @@ export const AREAS = [
  * `multi: true` = bản đồ mở ra danh sách thay vì một quán duy nhất.
  */
 export const PLACES = [
+  ...NEW_PLACES,
   // ---- Mỹ Đình — quanh nhà anh ----
   {
     area: "my-dinh",
@@ -1328,6 +1330,7 @@ export const PLACES = [
 
 /** Cung đường hẹn hò xếp sẵn theo mốc giờ. */
 export const ROUTES = [
+  ...NEW_ROUTES,
   {
     title: "Sáng phố cổ",
     meta: "3 – 4 tiếng · khoảng 250k / 2 người",

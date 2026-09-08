@@ -45,6 +45,7 @@ function sprite() {
 }
 
 function stars(score) {
+  if (score == null) return '<span class="stars" aria-label="Chưa chấm điểm riêng">—</span>';
   return `<span class="stars" style="--fill:${(score / 5) * 100}%" `
        + `role="img" aria-label="${vnNum(score)} trên 5 sao">`
        + `<i aria-hidden="true"></i></span>`;
@@ -71,15 +72,16 @@ function card(p) {
       + "chọn cái gần bạn nhất.)</em>"
     : "");
 
-  return `      <article class="eat" data-area="${p.area}" data-kind="${p.kinds.join(",")}" data-id="${id}" data-score="${p.score}">
+  return `      <article class="eat" id="quan-${id}" data-area="${p.area}" data-kind="${p.kinds.join(",")}" data-id="${id}" data-score="${p.score ?? ''}">
         <div class="eat__top">
           <div class="eat__id">
             <h4 class="eat__name">${esc(p.name)}</h4>
             <p class="eat__dish">${esc(p.dish)}</p>${gg}
+            ${p.source ? `<a class="eat__source" href="${p.source}" target="_blank" rel="noopener noreferrer">${esc(p.recognition)} ↗</a><small class="eat__checked">Đối chiếu 08/09/2026</small>` : ''}
           </div>
           <div class="eat__rate">
             ${stars(p.score)}
-            <span class="eat__score num">${vnNum(p.score)}</span>
+            <span class="eat__score num">${p.score == null ? 'Chưa chấm' : vnNum(p.score)}</span>
           </div>
         </div>
         <dl class="eat__meta">
@@ -127,15 +129,24 @@ ${items.map(card).join("")}      </div>
 }
 
 function route(r) {
+  const id = slug(r.title);
   const steps = r.steps.map((s) =>
     `<li><span class="route__t num">${esc(s.at)}</span><span>`
     + `<span class="route__h">${esc(s.what)}</span>`
-    + `<span class="route__d">${esc(s.note)}</span></span></li>`).join("");
-  return `      <div class="card route reveal">
+    + `<span class="route__d">${esc(s.note)}</span>${s.map ? `<a href="${mapsUrl(s.map)}" target="_blank" rel="noopener noreferrer">Chỉ đường ↗</a>` : ''}</span></li>`).join("");
+  return `      <details class="card route reveal" data-route="${id}">
+        <summary>
+        <span class="pill pill--rose">${esc(r.mood || 'Đi cùng nhau')}</span>
         <h3 class="card__title">${esc(r.title)}</h3>
         <p class="route__meta">${esc(r.meta)}</p>
+        <span class="route__open">Xem lịch trình & chọn ngày ↓</span></summary>
         <ol class="route__list">${steps}</ol>
-      </div>
+        <form class="date-plan">
+          <label for="date-${id}">Chọn ngày hẹn <input id="date-${id}" type="date" required aria-describedby="status-${id}"></label>
+          <div class="date-plan__actions"><button class="btn btn--primary" type="submit">Lưu buổi hẹn</button><button class="btn btn--ghost" type="button" data-calendar>Tải lịch .ics</button><button class="btn btn--ghost" type="button" data-remove-date hidden>Bỏ hẹn</button></div>
+          <p class="date-plan__status" id="status-${id}" role="status">Lịch gợi ý · chưa đặt bàn.</p>
+        </form>
+      </details>
 `;
 }
 
@@ -152,7 +163,7 @@ const countIn = (key) => PLACES.filter((p) => p.area === key).length;
 const countKind = (key) => PLACES.filter((p) => p.kinds.includes(key)).length;
 
 // --------------------------------------------------------------- dựng trang
-const html = `<!DOCTYPE html>
+let html = `<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8">
@@ -169,8 +180,9 @@ const html = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/dining.css">
 </head>
-<body>
+<body class="dining-page">
 
 <script>
 /* Bật hiệu ứng hiện dần khi cuộn. Nếu script này không chạy (JS bị chặn),
@@ -241,13 +253,13 @@ ${AREAS.map((a) => `      <li><a href="#kv-${a.key}"><svg class="ico" aria-hidde
   <div class="wrap">
     <span class="hero__eyebrow">
       <svg class="ico ico-sm" aria-hidden="true"><use href="#i-utensils"/></svg>
-      Ngoài lề — nhưng dùng nhiều nhất
+      Sổ hẹn của Thắng &amp; Ngọc Anh
     </span>
 
-    <h1 class="hero__names hero__names--page">Ăn gì ở Hà Nội</h1>
+    <h1 class="hero__names hero__names--page">Ăn gì ở Hà Nội<br><em>Hẹn nhau một bữa ngon.</em></h1>
 
     <p class="hero__lead">
-      Ngọc Anh vừa từ Nhật về ở hẳn. Từ giờ tới ngày cưới còn kha khá cuối tuần — đây là
+      Một bữa cơm gần nhà, một chiều đi dạo, hay một tối dành riêng cho hai đứa. Cùng khám phá
       <strong>${total} quán và khu ăn uống</strong> chia theo ${nAreas} khu vực. Mỗi chỗ có
       <strong>địa chỉ đầy đủ, chỉ dẫn tìm đường và nút mở thẳng Google Maps</strong>,
       kèm món nên gọi, giờ mở, khoảng giá và một mẹo riêng.
@@ -256,7 +268,7 @@ ${AREAS.map((a) => `      <li><a href="#kv-${a.key}"><svg class="ico" aria-hidde
 
     <div class="hero__actions">
       <a class="btn btn--primary" href="#danh-sach">
-        Xem danh sách
+        Khám phá ${total} địa điểm
         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-arrow"/></svg>
       </a>
       <a class="btn btn--ghost" href="#cung-duong">
@@ -316,7 +328,7 @@ ${AREAS.map((a) => `      <li><a href="#kv-${a.key}"><svg class="ico" aria-hidde
       <div class="stat">
         <span class="stat__k">Sợ lạc đường</span>
         <span class="stat__v">Bấm “Bản đồ”</span>
-        <p class="stat__d">Mỗi thẻ quán có dòng <strong>Tìm thế nào</strong> — rẽ từ đâu, lấy gì làm mốc, gửi xe chỗ nào — và nút <strong>Bản đồ</strong> mở thẳng Google Maps để bấm chỉ đường. Từng nút đã được mở thử trên Google Maps: ${nSingle} chỗ ra đúng thẻ quán, ${nMulti} chỗ là cả một dãy quán nên ra danh sách quanh đó.</p>
+        <p class="stat__d">Mỗi thẻ quán có dòng <strong>Tìm thế nào</strong> và nút <strong>Bản đồ</strong> mở Google Maps. ${nSingle} địa điểm có truy vấn theo tên quán; ${nMulti} địa điểm là cả một dãy quán. Kiểm tra đúng chi nhánh và giờ mở trước khi xuất phát.</p>
       </div>
       <div class="stat">
         <span class="stat__k">Giá ghi trong bảng</span>
@@ -370,10 +382,11 @@ ${AREAS.map(group).join("")}    <p class="eat-empty" id="eatEmpty" hidden>
       <h2 class="section__title">${nRoutes} buổi hẹn đã xếp sẵn</h2>
       <p class="section__sub">
         Ngại nghĩ thì cứ lấy nguyên một cung đường dưới đây mà đi. Có ghi kèm địa chỉ từng điểm;
-        các mốc giờ đã tính sẵn khoảng di chuyển giữa các điểm, đi xe máy trong nội thành.
+        giờ và ngân sách là dự trù cho hai người (trừ khi ghi khác). Xác nhận giờ mở, giá và bàn trống trước khi đi.
       </p>
     </div>
 
+    <p class="date-summary" id="dateSummary" role="status">Chọn ngày để lưu buổi hẹn trên trình duyệt này. Tải lịch để thêm vào ứng dụng lịch của bạn.</p>
     <div class="grid grid--2">
 ${ROUTES.map(route).join("")}    </div>
   </div>
@@ -481,6 +494,14 @@ ${AREAS.slice(0, 5).map((a) => `          <li><a href="#kv-${a.key}">${esc(a.tit
 </html>
 `;
 
+// Put actionable date plans before the long directory.
+const routesSection = html.match(/<section class="section section--alt" id="cung-duong">[\s\S]*?<\/section>/)[0];
+html = html.replace(routesSection, '');
+const featured = `<section class="section dining-featured" id="goi-y"><div class="wrap">
+  <div class="section__head"><span class="section__kicker">Mới trong sổ hẹn</span><h2 class="section__title">Bốn địa chỉ đáng dành một buổi tối</h2><p class="section__sub">Được MICHELIN ghi nhận hoặc giới thiệu. Mở nguồn ở từng thẻ để xem đánh giá; các quán mới chưa có điểm chấm riêng.</p></div>
+  <div class="featured-grid">${PLACES.filter(p => p.source).map((p, i) => `<a class="featured-place" href="#quan-${slug(p.name)}"><span class="featured-place__number">0${i + 1}</span><span class="pill pill--gold">${esc(p.recognition)}</span><h3>${esc(p.name)}</h3><p>${esc(p.dish)}</p><span>Xem địa điểm ↗</span></a>`).join('')}</div>
+</div></section>`;
+html = html.replace('<!-- ===================== DANH SÁCH QUÁN', featured + '\n' + routesSection + '\n<!-- ===================== DANH SÁCH QUÁN');
 const out = join(ROOT, "an-uong.html");
-writeFileSync(out, html.replace(/\r?\n/g, "\r\n"), "utf8");
+writeFileSync(out, html.replace(/[\t ]+\r?\n/g, '\n').replace(/\r?\n/g, "\r\n"), "utf8");
 console.log(`an-uong.html: ${total} quán · ${nAreas} khu vực · ${nRoutes} cung đường`);

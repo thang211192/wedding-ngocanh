@@ -42,6 +42,60 @@ const visibleCards = (page) =>
 const visibleNames = (page) =>
   page.locator(".eat:not([hidden]) .eat__name").allTextContents();
 
+describe('buổi hẹn đã xếp sẵn', () => {
+  test('lưu ngày, tải lại và bỏ hẹn; không ảnh hưởng quán muốn đi', async () => {
+    const { page, close } = await open();
+    try {
+      const route = page.locator('[data-route]').first();
+      await route.locator('summary').click();
+      await route.locator('input').fill('2026-10-10');
+      await route.locator('[type="submit"]').click();
+      await page.reload();
+      assert.equal(await route.getAttribute('data-planned'), 'true');
+      await route.locator('summary').click();
+      assert.equal(await route.locator('input').inputValue(), '2026-10-10');
+      await page.evaluate(() => localStorage.setItem('wnc:eats', '["gac-mien"]'));
+      await route.locator('[data-remove-date]').click();
+      await page.reload();
+      assert.equal(await route.getAttribute('data-planned'), 'false');
+      assert.equal(await page.locator('#eatSavedN').textContent(), '1');
+    } finally { await close(); }
+  });
+  test('tệp lịch giữ đúng giờ Hà Nội và đủ các điểm hẹn', async () => {
+    const { page, close } = await open();
+    try {
+      const route = page.locator('[data-route]').first();
+      await route.locator('summary').click();
+      await route.locator('input').fill('2026-10-10');
+      const downloadPromise = page.waitForEvent('download');
+      await route.locator('[data-calendar]').click();
+      const download = await downloadPromise;
+      const stream = await download.createReadStream();
+      const chunks = [];
+      for await (const chunk of stream) chunks.push(chunk);
+      const ics = Buffer.concat(chunks).toString('utf8').replace(/\r\n /g, '');
+      assert.match(ics, /DTSTART:20261010T103000Z/);
+      assert.match(ics, /DTEND:20261010T131500Z/);
+      assert.match(ics, /Luk Lak/);
+      assert.match(ics, /chưa đặt bàn/);
+      assert.ok(download.suggestedFilename().endsWith('.ics'));
+    } finally { await close(); }
+  });
+  test('chặn lưu khi thiếu ngày và thông báo khi trình duyệt chặn lưu trữ', async () => {
+    const { page, close } = await open();
+    try {
+      const route = page.locator('[data-route]').first();
+      await route.locator('summary').click();
+      await route.locator('[type="submit"]').click();
+      assert.equal(await route.getAttribute('data-planned'), 'false');
+      await route.locator('input').fill('2026-10-10');
+      await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('blocked'); }; });
+      await route.locator('[type="submit"]').click();
+      assert.match(await route.locator('[role="status"]').textContent(), /Không lưu được/);
+    } finally { await close(); }
+  });
+});
+
 // ---------------------------------------------------------------------------
 
 describe("dữ liệu hiển thị trên trang", () => {
