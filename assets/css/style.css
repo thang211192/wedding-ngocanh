@@ -580,10 +580,36 @@ input:focus-visible, select:focus-visible { border-color: var(--rose); outline: 
 .step__warn { background: var(--danger-wash); border-color: color-mix(in srgb, var(--danger) 26%, transparent); }
 .step__warn b { font-weight: 700; color: var(--danger); }
 
+/* Khung dẫn nhập đặt trên đầu một số giai đoạn: phân biệt những việc nghe
+   giống nhau mà khác hẳn nhau. Dùng lưới thay cho <table> vì bảng có
+   min-width 560px, lồng trong thẻ bước ở điện thoại sẽ phải cuộn ngang. */
+.brief {
+  margin-bottom: var(--s-3); padding: var(--s-3);
+  background: var(--gold-wash); border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+  border-radius: var(--r-md);
+}
+.brief__h { font-size: .95rem; font-weight: 700; color: var(--gold); margin: 0 0 var(--s-3); }
+.brief__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+.brief__list > li { display: grid; gap: 2px; margin: 0; }
+.brief__list b {
+  font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--gold);
+}
+.brief__list span { font-size: .9rem; line-height: 1.55; color: var(--ink-2); }
+.brief__list strong { color: var(--ink); }
+.brief__foot {
+  margin: var(--s-3) 0 0; padding-top: var(--s-3);
+  border-top: 1px solid color-mix(in srgb, var(--gold) 26%, transparent);
+  font-size: .88rem; line-height: 1.55; color: var(--ink-2);
+}
+.brief__foot strong { color: var(--ink); }
+
 @media (min-width: 700px) {
   .steps > summary { padding: var(--s-3) var(--s-5); }
   .steps__body { padding: var(--s-4) var(--s-5) var(--s-5); }
   .step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-3); padding: var(--s-4); }
+  .brief { padding: var(--s-4); }
+  .brief__list > li { grid-template-columns: 150px minmax(0, 1fr); gap: var(--s-3); align-items: baseline; }
   .step__tick { position: static; margin: -10px 0 -10px -10px; }
   .step__n, .step__title { padding-left: 0; }
 }
