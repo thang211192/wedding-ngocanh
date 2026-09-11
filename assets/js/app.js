@@ -359,6 +359,76 @@
     refreshChecklist();
   }
 
+  /* ---------------- 6b. Chi tiết từng bước ----------------
+     Tách hẳn khỏi checklist 114 việc ở mục "Chuẩn bị": đây là hướng dẫn
+     CÁCH LÀM theo trình tự, lưu riêng dưới khoá 'steps'. Hai nơi không
+     ghi đè tiến độ của nhau. */
+  function refreshSteps() {
+    var all = $$('.step input[type="checkbox"][data-step]');
+
+    $$('[data-steps]').forEach(function (group) {
+      var boxes = $$('input[type="checkbox"][data-step]', group);
+      var done = boxes.filter(function (b) { return b.checked; }).length;
+      updateProgressBar($('.progress__bar', group), null, done, boxes.length);
+      var counter = $('.steps__count', group);
+      if (counter) counter.textContent = done + '/' + boxes.length + ' bước';
+    });
+
+    var done = all.filter(function (b) { return b.checked; }).length;
+    updateProgressBar($('#stepsBar'), $('#stepsNum'), done, all.length);
+  }
+
+  function initSteps() {
+    var saved = store.get('steps', {});
+    var boxes = $$('.step input[type="checkbox"][data-step]');
+    if (!boxes.length) return;
+
+    boxes.forEach(function (b) {
+      var id = b.getAttribute('data-step');
+      if (saved[id]) b.checked = true;
+      b.addEventListener('change', function () {
+        var s = store.get('steps', {});
+        if (b.checked) s[id] = 1; else delete s[id];
+        store.set('steps', s);
+        refreshSteps();
+      });
+    });
+
+    var expandBtn = $('#expandSteps');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', function () {
+        var groups = $$('#lo-trinh .steps');
+        var anyClosed = groups.some(function (g) { return !g.open; });
+        groups.forEach(function (g) { g.open = anyClosed; });
+        expandBtn.textContent = anyClosed ? 'Thu gọn tất cả chi tiết' : 'Mở tất cả chi tiết';
+      });
+    }
+
+    var resetBtn = $('#resetSteps');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!window.confirm('Bỏ tick toàn bộ các bước trong lộ trình? Thao tác này không hoàn tác được.')) return;
+        store.del('steps');
+        boxes.forEach(function (b) { b.checked = false; });
+        refreshSteps();
+        toast('Đã xoá tiến độ các bước trong lộ trình.');
+      });
+    }
+
+    // In ra giấy thì mở hết, in xong trả lại như cũ — bản in phải đủ nội dung.
+    var reopen = [];
+    window.addEventListener('beforeprint', function () {
+      reopen = $$('#lo-trinh .steps').filter(function (g) { return !g.open; });
+      reopen.forEach(function (g) { g.open = true; });
+    });
+    window.addEventListener('afterprint', function () {
+      reopen.forEach(function (g) { g.open = false; });
+      reopen = [];
+    });
+
+    refreshSteps();
+  }
+
   /* ---------------- 7. Ngân sách ---------------- */
   var CAT_COLORS_LIGHT = {
     'nghi-le': '#c2185b', 'trang-suc': '#7c3aed', 'anh-video': '#0e7490',
@@ -914,7 +984,7 @@
     var resetAll = $('#resetAll');
     if (resetAll) {
       resetAll.addEventListener('click', function () {
-        if (!window.confirm('Xoá toàn bộ dữ liệu đã lưu trên trình duyệt này (checklist, ngân sách, ngày cưới, danh sách quán muốn đi)?')) return;
+        if (!window.confirm('Xoá toàn bộ dữ liệu đã lưu trên trình duyệt này (các bước trong lộ trình, checklist, ngân sách, ngày cưới, danh sách quán muốn đi)?')) return;
         store.clearAll();
         window.location.reload();
       });
@@ -940,6 +1010,7 @@
     initSpy();
     initWeddingDate();
     initChecklist();
+    initSteps();
     initBudget();
     initTrap();
     initEats();
