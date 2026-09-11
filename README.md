@@ -4,7 +4,8 @@ Trang web tĩnh ghi lại toàn bộ lộ trình tiến tới đám cưới theo
 dựng rạp làm cỗ tại nhà, hai nhà cùng xóm, bên lương thờ cúng tổ tiên.
 
 Gồm sáu nghi lễ truyền thống, lộ trình chi tiết theo từng tuần, **hướng dẫn cầm tay chỉ việc
-131 bước** cho 10 giai đoạn, checklist 114 đầu việc, máy tính cỗ, bảng chi phí theo giá quê,
+131 bước** cho 10 giai đoạn, **19 kịch bản lời nói** cho người ngại ăn nói,
+checklist 114 đầu việc, máy tính cỗ, bảng chi phí theo giá quê,
 kịch bản hai ngày cưới, kiêng kỵ và thủ tục pháp lý.
 
 Kèm một **trang phụ riêng** — `an-uong.html` — cho phần ngoài lề nhưng dùng nhiều nhất
@@ -63,6 +64,7 @@ sẽ phải thêm hệ module vào một repo cố tình không có build step c
 | **Tổng quan** | Bốn quyết định gốc; lợi thế và điểm cần để ý khi hai nhà cùng quê, cùng xóm |
 | **Lộ trình** | 10 giai đoạn, mốc thời gian **tự tính ngược** từ ngày cưới bạn nhập. Mỗi giai đoạn mở ra được **chi tiết từng bước** — tổng 131 bước, mỗi bước ghi rõ ai làm · khi nào · làm thế nào · nói câu gì · xong khi nào · chỗ nào dễ sai |
 | **Nghi lễ** | Dạm ngõ · Ăn hỏi · Xin dâu · Vu quy · Tân hôn · Lại mặt, kèm nét riêng đám cưới quê Nam Định |
+| **Ăn nói** | Ai nói phần nào ở mỗi lễ, bảng xưng hô theo vai vế, **19 kịch bản lời nói** kèm câu mẫu để đọc to lên mà tập, cách gỡ khi bí |
 | **Tráp ăn hỏi** | Bộ chọn 3/5/7/9/11 tráp, nội dung từng tráp, cách bàn chuyện lễ đen |
 | **Chuẩn bị** | Checklist 114 đầu việc chia 8 nhóm, có thanh tiến độ |
 | **Chi phí** | Máy tính cỗ + 37 khoản mục, 3 mức, sửa được từng con số |
@@ -84,6 +86,11 @@ Trang phụ `an-uong.html`:
 - **Đổi ngày cưới** ở đầu trang → toàn bộ mốc thời gian trong lộ trình tự tính lại, kèm đếm ngược.
 - **Máy tính cỗ** — nhập số mâm hai nhà, số người mỗi mâm (mặc định 6 như cỗ quê) và đơn giá;
   tiền cỗ hai bên, tổng số mâm và số khách dự kiến tự tính, đổ thẳng vào bảng chi phí.
+- **Kịch bản lời nói** (`#an-noi`) — 19 tình huống chú rể thật sự phải mở miệng, xếp theo
+  giai đoạn: thưa bố mẹ, ra mắt nhà gái, hỏi giá đội nấu cỗ, đi mời cưới, chào bàn, khi bị ép
+  rượu, lễ lại mặt. Mỗi tình huống có câu mẫu đầy đủ, bản rút gọn, cái cần tránh và cách đáp khi
+  bị hỏi lại. Kèm bảng xưng hô theo vai vế và bảng "ở mỗi lễ ai nói phần nào". Từng giai đoạn
+  trong Lộ trình có link trỏ thẳng sang đúng nhóm câu mẫu của giai đoạn đó.
 - **Chi tiết từng bước** — mỗi giai đoạn trong lộ trình có một khối bấm để mở, bên trong là
   các bước đánh số kèm ô tích và thanh tiến độ riêng. Phần lời thoại mẫu (“Nói thế nào”) có ở
   các bước nghi lễ: thưa chuyện dạm ngõ, xin cưới, xin dâu, đi mời cỗ.

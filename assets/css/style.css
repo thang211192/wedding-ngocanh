@@ -841,6 +841,47 @@ tr[data-off="true"] .money-input { text-decoration: line-through; }
 .dd ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-3); }
 .dd li { display: flex; gap: var(--s-2); align-items: flex-start; font-size: .93rem; color: var(--ink-2); margin: 0; }
 .dd li svg { flex: none; margin-top: 3px; }
+
+/* ---------- 13b. Kịch bản lời nói ---------- */
+.say { border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); padding: var(--s-4); }
+.say + .say { margin-top: var(--s-3); }
+.say__h { font-size: 1.02rem; line-height: 1.4; margin: 0 0 var(--s-2); color: var(--ink); }
+.say__ctx { margin: 0 0 var(--s-3); font-size: .88rem; line-height: 1.55; color: var(--ink-3); }
+
+/* Câu mẫu là thứ người dùng sẽ đọc to lên để tập — cho nó cỡ chữ lớn hơn
+   phần xung quanh và giãn dòng rộng, dễ nhìn theo khi đang nói. */
+.say__full {
+  margin: 0; padding: var(--s-4);
+  background: var(--gold-wash); border: 1px solid color-mix(in srgb, var(--gold) 26%, transparent);
+  border-left: 3px solid var(--gold); border-radius: var(--r-sm);
+}
+.say__full p { margin: 0; font-size: 1.02rem; line-height: 1.75; color: var(--ink); font-style: italic; }
+.say__full p + p { margin-top: var(--s-3); }
+.say__full footer { margin-top: var(--s-3); font-size: .84rem; line-height: 1.5; color: var(--ink-3); font-style: normal; }
+
+.say__rows { margin: var(--s-3) 0 0; display: grid; gap: var(--s-3); }
+.say__rows > div { display: grid; gap: 2px; }
+.say__rows dt {
+  font-size: .7rem; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.say__rows dd { margin: 0; font-size: .9rem; line-height: 1.55; color: var(--ink-2); }
+.say__rows dd em { color: var(--ink); font-style: italic; }
+.say__rows .say__row--no dt { color: var(--danger); }
+
+.say-group { display: grid; gap: var(--s-3); }
+.steps__link {
+  display: flex; align-items: flex-start; gap: var(--s-2);
+  margin: 0 0 var(--s-3); padding: 10px var(--s-3);
+  background: var(--surface-3); border-radius: var(--r-sm);
+  font-size: .88rem; line-height: 1.5; color: var(--ink-2);
+}
+.steps__link svg { flex: none; margin-top: 2px; color: var(--rose); }
+
+@media (min-width: 700px) {
+  .say { padding: var(--s-5); }
+  .say__rows > div { grid-template-columns: 150px minmax(0, 1fr); gap: var(--s-3); align-items: baseline; }
+}
 .dd--do li svg { color: var(--ok); }
 .dd--dont li svg { color: var(--danger); }
 

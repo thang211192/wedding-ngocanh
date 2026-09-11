@@ -151,3 +151,54 @@ describe("chi tiết từng bước", () => {
     }
   });
 });
+
+describe("mục ăn nói", () => {
+  test("có trên thanh điều hướng và đủ 19 kịch bản", async () => {
+    const { page, errors, close } = await open();
+    try {
+      assert.equal(await page.locator('.nav__link[href="#an-noi"]').count(), 1);
+      assert.equal(await page.locator("#an-noi .say").count(), 19);
+
+      // Số ghi trên mỗi nhóm phải khớp số kịch bản thật bên trong.
+      const groups = page.locator("#an-noi .acc");
+      for (let i = 0; i < (await groups.count()); i++) {
+        const g = groups.nth(i);
+        const n = await g.locator(".say").count();
+        assert.equal(await g.locator(".acc__count").textContent(), `${n} tình huống`);
+      }
+      assert.deepEqual(errors, []);
+    } finally {
+      await close();
+    }
+  });
+
+  test("mọi link từ Lộ trình đều trỏ tới một nhóm có thật", async () => {
+    const { page, close } = await open();
+    try {
+      const hrefs = await page
+        .locator("#lo-trinh .steps__link a")
+        .evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.equal(hrefs.length, 7);
+      for (const href of hrefs) {
+        assert.equal(await page.locator(href).count(), 1, `thiếu ${href}`);
+      }
+    } finally {
+      await close();
+    }
+  });
+
+  test("nền các mục vẫn xen kẽ, không hai mục liền nhau trùng nền", async () => {
+    const { page, close } = await open();
+    try {
+      const alts = await page
+        .locator("main section.section, body > section.section")
+        .evaluateAll((els) => els.map((e) => e.classList.contains("section--alt")));
+      assert.ok(alts.length >= 10, `chỉ thấy ${alts.length} mục`);
+      for (let i = 1; i < alts.length; i++) {
+        assert.notEqual(alts[i], alts[i - 1], `mục thứ ${i + 1} trùng nền với mục trước`);
+      }
+    } finally {
+      await close();
+    }
+  });
+});
