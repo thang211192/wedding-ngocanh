@@ -153,18 +153,25 @@ describe("chi tiết từng bước", () => {
 });
 
 describe("mục ăn nói", () => {
-  test("có trên thanh điều hướng và đủ 19 kịch bản", async () => {
+  test("có trên thanh điều hướng và đủ 24 kịch bản", async () => {
     const { page, errors, close } = await open();
     try {
       assert.equal(await page.locator('.nav__link[href="#an-noi"]').count(), 1);
-      assert.equal(await page.locator("#an-noi .say").count(), 19);
+      assert.equal(await page.locator("#an-noi .say").count(), 24);
 
-      // Số ghi trên mỗi nhóm phải khớp số kịch bản thật bên trong.
+      // Số ghi trên mỗi nhóm phải khớp số mục thật bên trong. Mỗi nhóm chỉ dùng
+      // một loại mục, nên cộng cả bốn loại lại là ra đúng số của nhóm đó.
       const groups = page.locator("#an-noi .acc");
+      assert.ok((await groups.count()) >= 12, "thiếu nhóm trong mục Ăn nói");
       for (let i = 0; i < (await groups.count()); i++) {
         const g = groups.nth(i);
-        const n = await g.locator(".say").count();
-        assert.equal(await g.locator(".acc__count").textContent(), `${n} tình huống`);
+        const label = await g.locator(".acc__count").textContent();
+        const m = /^(\d+) (tình huống|cách nói|chủ đề|câu hỏi|mốc)$/.exec(label);
+        assert.ok(m, `nhãn nhóm không đúng mẫu: ${label}`);
+        const n = await g
+          .locator(".say, .talk__item, .qa__item, .sched__row")
+          .count();
+        assert.equal(Number(m[1]), n, `nhóm "${label}" ghi lệch so với ${n} mục thật`);
       }
       assert.deepEqual(errors, []);
     } finally {
@@ -178,10 +185,59 @@ describe("mục ăn nói", () => {
       const hrefs = await page
         .locator("#lo-trinh .steps__link a")
         .evaluateAll((els) => els.map((e) => e.getAttribute("href")));
-      assert.equal(hrefs.length, 7);
+      // Bảy giai đoạn có kịch bản, cộng một link riêng cho buổi đặt vấn đề.
+      assert.equal(hrefs.length, 8);
       for (const href of hrefs) {
         assert.equal(await page.locator(href).count(), 1, `thiếu ${href}`);
       }
+    } finally {
+      await close();
+    }
+  });
+
+  test("buổi đặt vấn đề có đủ năm nhóm và mọi link trong trang đều trỏ đúng chỗ", async () => {
+    const { page, close } = await open();
+    try {
+      assert.equal(await page.locator("#dat-van-de").count(), 1);
+      for (const id of [
+        "#noi-dat-van-de",
+        "#noi-dien-bien",
+        "#noi-mau-chuyen",
+        "#noi-cau-hoi",
+        "#noi-tinh-huong",
+      ]) {
+        assert.equal(await page.locator(id).count(), 1, `thiếu nhóm ${id}`);
+      }
+
+      // Toàn trang: mọi link nội bộ phải tới được một chỗ có thật. Mục Ăn nói
+      // trỏ chéo sang Lộ trình và ngược lại, rất dễ gõ sai một id mà không ai
+      // phát hiện — để test bắt thay.
+      const hrefs = await page
+        .locator('a[href^="#"]')
+        .evaluateAll((els) =>
+          els.map((e) => e.getAttribute("href")).filter((h) => h && h !== "#"),
+        );
+      assert.ok(hrefs.length > 20, `chỉ thấy ${hrefs.length} link nội bộ`);
+      for (const href of new Set(hrefs)) {
+        assert.equal(await page.locator(href).count(), 1, `link chết: ${href}`);
+      }
+    } finally {
+      await close();
+    }
+  });
+
+  test("in ra giấy thì các nhóm kịch bản tự mở rồi đóng lại", async () => {
+    const { page, close } = await open();
+    try {
+      const closed = () => page.locator("#an-noi .acc:not([open])").count();
+      const before = await closed();
+      assert.ok(before > 0, "lẽ ra phải có nhóm đang đóng");
+
+      await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+      assert.equal(await closed(), 0, "in mà vẫn còn nhóm đóng thì bản in thiếu nội dung");
+
+      await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+      assert.equal(await closed(), before);
     } finally {
       await close();
     }

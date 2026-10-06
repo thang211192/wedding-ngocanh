@@ -418,7 +418,7 @@
     // In ra giấy thì mở hết, in xong trả lại như cũ — bản in phải đủ nội dung.
     var reopen = [];
     window.addEventListener('beforeprint', function () {
-      reopen = $$('#lo-trinh .steps').filter(function (g) { return !g.open; });
+      reopen = $$('#lo-trinh .steps, #an-noi .acc').filter(function (g) { return !g.open; });
       reopen.forEach(function (g) { g.open = true; });
     });
     window.addEventListener('afterprint', function () {

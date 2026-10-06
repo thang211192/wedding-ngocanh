@@ -885,6 +885,45 @@ tr[data-off="true"] .money-input { text-decoration: line-through; }
 .dd--do li svg { color: var(--ok); }
 .dd--dont li svg { color: var(--danger); }
 
+/* ---------- 13c. Buổi đặt vấn đề — kho mẩu chuyện & câu hỏi ---------- */
+/* Hai thành phần dưới đây phục vụ cùng một việc: mắt quét nhanh, nhặt lấy một
+   câu để nói ngay. Nên câu nói mẫu luôn nằm trên nền vàng giống .say__full —
+   chỗ cần đọc to lên lúc nào cũng là chỗ sáng nhất trong khối. */
+.talk, .qa { display: grid; gap: var(--s-3); }
+.talk__item, .qa__item {
+  padding: var(--s-3);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md);
+}
+.talk__top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); margin-bottom: var(--s-2); }
+.talk__topic { font-weight: 650; font-size: .98rem; line-height: 1.4; color: var(--ink); }
+.talk__open, .qa__a {
+  margin: 0; padding: 10px var(--s-3);
+  background: var(--gold-wash); border-left: 3px solid var(--gold); border-radius: var(--r-sm);
+  font-size: .98rem; line-height: 1.7; font-style: italic; color: var(--ink);
+}
+.talk__more { margin: var(--s-2) 0 0; padding-left: 1.15em; display: grid; gap: var(--s-1); }
+.talk__more li { font-size: .9rem; line-height: 1.6; color: var(--ink-2); font-style: italic; }
+.talk__why { margin: var(--s-2) 0 0; font-size: .84rem; line-height: 1.5; color: var(--ink-3); }
+
+.qa__q { margin: 0 0 var(--s-2); font-size: .98rem; line-height: 1.5; font-weight: 650; color: var(--ink); }
+.qa__q::before {
+  content: "Hỏi"; display: inline-block; margin-right: var(--s-2);
+  padding: 1px 7px; border-radius: var(--r-pill);
+  background: var(--surface-3); color: var(--ink-3);
+  font-size: .68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  vertical-align: 2px;
+}
+.qa__a + .qa__a { margin-top: var(--s-2); }
+/* Nhóm tình huống: ô không phải câu hỏi mà là một hoàn cảnh — đổi nhãn. */
+.qa--sit .qa__q::before { content: "Nếu"; }
+.qa__n, .qa__x { margin: var(--s-2) 0 0; font-size: .84rem; line-height: 1.55; color: var(--ink-3); }
+.qa__x b { color: var(--danger); font-weight: 700; }
+.qa__n b { color: var(--ink-2); font-weight: 700; }
+
+@media (min-width: 700px) {
+  .talk__item, .qa__item { padding: var(--s-4); }
+}
+
 /* ---------- 14. Day-of schedule ---------- */
 .sched { display: grid; gap: 0; }
 .sched__row {
@@ -1175,6 +1214,7 @@ tr[data-off="true"] .money-input { text-decoration: line-through; }
   .acc { break-inside: avoid; }
   .acc > summary { pointer-events: none; }
   .step { break-inside: avoid; box-shadow: none; opacity: 1 !important; }
+  .say, .talk__item, .qa__item { break-inside: avoid; box-shadow: none; }
   .steps > summary { pointer-events: none; }
   .steps__chev, .steps__progress { display: none !important; }
   body { background: #fff; }
