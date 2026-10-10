@@ -113,7 +113,7 @@
 
     var moi = [
       { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc nỉ, canh giữa mảng tường giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
-      { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2)', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
+      { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2), gầm tab để loa sub', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
       { id: 'ns2', n: 2, name: '', x0: W - 0.45, x1: W, z0: bed.z1 + 0.05, z1: bed.z1 + 0.5, kind: 'wood' },
       { id: 'feat', n: 3, name: 'Vách lam gỗ + LED hắt sau đầu giường', x0: W - 0.06, x1: W, z0: featZ0, z1: featZ1, kind: 'feat' },
       { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm, dưới điều hoà', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
@@ -842,6 +842,10 @@
       R.add(hy);
 
       // --- Tab đầu giường + đèn thả ---
+      // Loa sub của bộ loa cũ: đặt dưới gầm tab treo phía tường cửa sổ nhỏ (kệ TV cũ không mang vào phòng)
+      var n1 = get('ns1');
+      box(R, mats.black, W - 0.4, W - 0.06, 0, 0.36, (n1.z0 + n1.z1) / 2 - 0.13, (n1.z0 + n1.z1) / 2 + 0.13);
+
       ['ns1', 'ns2'].forEach(function (id) {
         var n = get(id);
         box(R, mats.wood, n.x0, n.x1 - 0.02, 0.38, 0.56, n.z0, n.z1);
