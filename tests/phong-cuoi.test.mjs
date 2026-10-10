@@ -138,6 +138,19 @@ describe("phối cảnh 3D", () => {
   });
 });
 
+describe("cửa 1", () => {
+  test("có hình trước / sau, và dòng chi phí dẫn tới hình", async () => {
+    const { page, errors, close } = await open();
+    try {
+      assert.equal(await page.locator("#cua-1 .ev__svg").count(), 2);
+      assert.match(await page.locator("#cua-1 .ev__svg").nth(1).getAttribute("aria-label"), /cửa sổ/);
+      assert.equal(await page.locator('[data-cost] a[href="#cua-1"]').count(), 1);
+      assert.equal(await page.locator('[data-cam="cua1"]').count(), 1);
+      assert.deepEqual(errors, []);
+    } finally { await close(); }
+  });
+});
+
 describe("liên kết", () => {
   test("trang chính có đường sang trang phòng cưới", async () => {
     const { page, close } = await open("/index.html");

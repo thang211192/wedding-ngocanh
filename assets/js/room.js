@@ -575,7 +575,9 @@
           : { target: [W / 2, 0, L / 2], pos: [W / 2 - 0.12, Math.max(6.5, L * 1.05), L / 2] },
         giuong: { target: [W - 0.4, 1.0, lay.bed.z0 + 0.9], pos: [0.35, 1.55, lay.bed.z0 + 0.9 + 0.15] },
         nhinra: { target: [0.9, 0.9, L - 0.9], pos: [W - 0.7, 1.6, Math.max(0.5, lay.bed.z0 - 0.2)] },
-        thaydo: { target: [W - 0.9, 1.0, L - 0.6], pos: [0.45, 1.6, P + 0.1] }
+        thaydo: { target: [W - 0.9, 1.0, L - 0.6], pos: [0.45, 1.6, P + 0.1] },
+        // đứng phía đầu giường nhìn ra cửa 1 (đã thành cửa sổ) và mảng tường TV
+        cua1: { target: [0, 1.25, 1.0], pos: [W - 0.25, 1.55, 2.35] }
       };
     }
 

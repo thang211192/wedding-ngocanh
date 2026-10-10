@@ -184,3 +184,36 @@
 .got li::marker { color: var(--ok); }
 .asks-short li::marker { color: var(--gold); font-weight: 700; }
 .asks-note { margin: var(--s-4) 0 0; font-size: .88rem; color: var(--ink-3); }
+
+/* ---------- Mặt đứng cửa 1 (trước / sau) ---------- */
+.ev { margin-top: var(--s-6); }
+.ev__head { max-width: 80ch; }
+.ev__head .pill { margin-bottom: var(--s-3); }
+.ev__pair > * { min-width: 0; }
+.ev__pair { display: grid; gap: var(--s-4); grid-template-columns: 1fr; margin-top: var(--s-5); }
+@media (min-width: 820px) { .ev__pair { grid-template-columns: 1fr 1fr; } }
+.ev__fig { margin: 0; padding: var(--s-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface-2); }
+.ev__fig figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .9rem; color: var(--ink-2); margin-bottom: var(--s-2); }
+.ev__scroll { overflow-x: auto; }
+.ev__svg { display: block; width: 100%; min-width: 380px; height: auto; font-family: var(--font-body);
+  --ev-wall: #f1e7dc; --ev-line: #6d5a4f; --ev-wood: #6b4a33; --ev-glass: #cfe3ea; --ev-brick: #c98b6b; --ev-frame: #e8e8e4; --ev-ink: #3b2a31; }
+[data-theme="dark"] .ev__svg { --ev-wall: #3a2e33; --ev-line: #c9b2a2; --ev-wood: #8a6347; --ev-glass: #5f7f8c; --ev-brick: #a5684c; --ev-frame: #9a9a96; --ev-ink: #f2e4ea; }
+.ev-wall { fill: var(--ev-wall); stroke: var(--ev-line); stroke-width: 1.5; }
+.ev-ground { stroke: var(--ev-line); stroke-width: 3; }
+.ev-ceil { stroke: var(--ev-line); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.ev-leaf { fill: var(--ev-wood); stroke: var(--ev-line); stroke-width: 1; }
+.ev-glass { fill: var(--ev-glass); stroke: var(--ev-line); stroke-width: 1; }
+.ev-brick { fill: var(--ev-brick); stroke: var(--ev-line); stroke-width: 1.5; }
+.ev-mortar { stroke: rgba(255, 255, 255, .55); stroke-width: 1.2; }
+.ev-sill { fill: var(--ev-frame); stroke: var(--ev-line); stroke-width: 1; }
+.ev-frame { fill: var(--ev-frame); stroke: var(--ev-line); stroke-width: 1.5; }
+.ev-grille { stroke: var(--ev-line); stroke-width: 1.2; opacity: .7; }
+.ev-ac { fill: none; stroke: var(--ev-line); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.ev-dim { stroke: var(--ev-line); stroke-width: 1; }
+.ev-dimt { font-size: 12px; font-weight: 700; fill: var(--ev-ink); }
+.ev-label { font-size: 14px; font-weight: 700; fill: var(--ev-ink); }
+.ev-note { font-size: 11px; fill: var(--ev-line); }
+.ev-brickt { font-size: 12px; font-weight: 700; fill: #fff; }
+.ev__notes { margin-top: var(--s-5); }
+.ev__notes h4 { font-size: 1rem; margin: 0 0 var(--s-2); }
+.ev__notes p { margin: 0; font-size: .92rem; color: var(--ink-2); }
