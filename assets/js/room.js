@@ -112,7 +112,7 @@
     var featZ0 = Math.max(0.05, bed.z0 - 0.65), featZ1 = Math.min(P - 0.05, bed.z1 + 0.65);
 
     var moi = [
-      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc nỉ, canh giữa mảng tường giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
+      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc vải chống mèo cào, canh giữa mảng tường giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
       { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2), gầm tab để loa sub', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
       { id: 'ns2', n: 2, name: '', x0: W - 0.45, x1: W, z0: bed.z1 + 0.05, z1: bed.z1 + 0.5, kind: 'wood' },
       { id: 'feat', n: 3, name: 'Vách lam gỗ + LED hắt sau đầu giường', x0: W - 0.06, x1: W, z0: featZ0, z1: featZ1, kind: 'feat' },
@@ -122,17 +122,21 @@
       { id: 'mirror', n: 7, name: 'Gương toàn thân treo tường, cạnh bàn trang điểm', x0: 0, x1: 0.05, z0: L - 1.1, z1: L - 0.55, kind: 'mirror' },
       { id: 'desk', n: 8, name: 'Bàn trang điểm / làm việc dưới cửa sổ 80 × 100', x0: desk.x0, x1: desk.x1, z0: desk.z0, z1: desk.z1, kind: 'wood' },
       { id: 'stool', n: 0, name: '', x0: sinkC - 0.22, x1: sinkC + 0.22, z0: L - 0.9, z1: L - 0.5, kind: 'stool' },
-      { id: 'sofa', n: 9, name: 'Ghế văng 2 chỗ có hộc + bàn trà Ø42 + đèn đọc sách', x0: sofa.x0, x1: sofa.x1, z0: sofa.z0, z1: sofa.z1, kind: 'sofa' },
+      { id: 'sofa', n: 9, name: 'Ghế văng 2 chỗ có hộc, vải chống mèo cào + bàn trà Ø42 + đèn đọc sách', x0: sofa.x0, x1: sofa.x1, z0: sofa.z0, z1: sofa.z1, kind: 'sofa' },
       { id: 'table', n: 0, name: '', x0: W - 1.13, x1: W - 0.71, z0: L - 1.55, z1: L - 1.13, kind: 'round' },
       { id: 'rug2', n: 0, name: '', x0: Math.max(desk.x1 + 0.05, W - 1.55), x1: W - 0.1, z0: Math.max(wardrobe.z1 + 0.05, L - 1.75), z1: L - 0.1, kind: 'rug' },
-      { id: 'plant', n: 10, name: 'Cây xanh ×2: cạnh cửa sổ mới và góc bàn trang điểm', x0: 0.08, x1: 0.48, z0: 0.08, z1: 0.48, kind: 'plant' },
+      { id: 'plant', n: 10, name: 'Cây không độc với mèo: cau vàng cạnh cửa sổ mới, cau tiểu trâm góc bàn trang điểm', x0: 0.08, x1: 0.48, z0: 0.08, z1: 0.48, kind: 'plant' },
       { id: 'plant2', n: 10, name: '', x0: 0.03, x1: 0.35, z0: L - 0.4, z1: L - 0.05, kind: 'plant' },
+      // Trụ cào cho mèo: cạnh giường, ngay đầu vách lam, chỗ mèo ngủ dậy là cào
+      { id: 'scratch', n: 12, name: 'Trụ cào sisal cho mèo, cao 90 cm', x0: W - 0.43, x1: W - 0.03, z0: Math.max(P - 0.42, bed.z1 + 0.53), z1: Math.max(P - 0.42, bed.z1 + 0.53) + 0.4, kind: 'stool' },
       { id: 'shoe', n: 11, name: 'Tủ giày + móc khăn sát cửa 3 (lối ra nhà tắm)', x0: 0, x1: 0.32, z0: Math.max(d3.to + 0.1, P + 0.1), z1: Math.min(Math.max(d3.to + 1.0, P + 1.0), L - 1.15), kind: 'wood' }, // dừng trước gương
       { id: 'hooks', n: 11, name: '', x0: 0, x1: 0.06, z0: Math.max(P + 0.1, d2.to + 0.05, d3.from - 0.45), z1: d3.from - 0.05, kind: 'hooks' }
     ];
 
     // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
     moi = moi.filter(function (it) { return it.id !== 'hooks' || it.z1 - it.z0 >= 0.2; });
+    // Trụ cào chỉ vẽ khi lọt giữa tab đầu giường và vách cũ (tủ áo bắt đầu ngay sau vách)
+    moi = moi.filter(function (it) { return it.id !== 'scratch' || it.z1 <= P + 0.05; });
 
     // --- Hiện trạng ---
     var cu = [
@@ -455,6 +459,7 @@
       slat: std('#b5895a', { roughness: 0.6 }),
       backing: std('#6d5544'),
       head: std('#d8c8b2', { roughness: 1 }),
+      band: std('#d8c8b2', { roughness: 0.55 }), // dải sơn bóng mờ 0–90 cm, cùng màu đầu giường
       bed: std('#f7f2ea', { roughness: 1 }),
       duvet: std('#e8ddcd', { roughness: 1 }),
       accent: std('#8e3b46', { roughness: 1 }),
@@ -730,6 +735,20 @@
           fillOpening(g, k, o, W, L);
         });
         seg(cur, d.len[1], 0, H);
+        // Dải sơn đậm 0–90 cm (lau chùi được, mèo không bấu được), chừa các ô cửa đi
+        var lo = Math.max(0, d.len[0]), hi = k === 'A' || k === 'C' ? Math.min(L, d.len[1]) : d.len[1];
+        var cuts = ops.filter(function (o) { return o.bottom < 0.9; });
+        var bu = lo;
+        cuts.concat([{ from: hi, to: hi }]).forEach(function (o) {
+          var u0 = bu, u1 = Math.min(o.from, hi), bd = 0.003;
+          if (u1 - u0 > 0.01) {
+            if (k === 'A') box(g, mats.band, 0, bd, 0.08, 0.9, u0, u1, { shadow: false });
+            else if (k === 'C') box(g, mats.band, W - bd, W, 0.08, 0.9, u0, u1, { shadow: false });
+            else if (k === 'B') box(g, mats.band, u0, u1, 0.08, 0.9, 0, bd, { shadow: false });
+            else box(g, mats.band, u0, u1, 0.08, 0.9, L - bd, L, { shadow: false });
+          }
+          bu = Math.max(bu, o.to);
+        });
         // Len chân tường gỗ + đường LED hắt trần
         var inset = 0.012;
         if (k === 'A') { box(g, mats.wood, 0, inset, 0, 0.08, 0, L, { shadow: false }); box(g, mats.led, 0, 0.02, H - 0.04, H - 0.02, 0.05, L - 0.05, { shadow: false }); }
@@ -810,7 +829,7 @@
       for (var hz = bz0; hz <= bz1 + 0.001; hz += (bz1 - bz0 + 0.2) / 6) {
         box(R, mats.backing, b.x1 - 0.105, b.x1 - 0.1, 0.12, 1.18, hz - 0.1, hz - 0.095, { shadow: false });
       }
-      box(R, mats.head, bx0, bx1, 0.06, 0.34, bz0, bz1); // khung bọc nỉ
+      box(R, mats.head, bx0, bx1, 0.06, 0.34, bz0, bz1); // khung bọc vải chống mèo cào
       box(R, mats.bed, bx0 + 0.02, bx1, 0.34, 0.56, bz0 + 0.02, bz1 - 0.02); // nệm
       var duvet = box(R, mats.duvet, bx0, bx1 - 0.55, 0.3, 0.6, bz0 - 0.01, bz1 + 0.01);
       duvet.userData.role = 'duvet';
@@ -960,7 +979,16 @@
         box(R, mats.metal, 0.03, 0.09, 1.6, 1.63, hz - 0.01, hz + 0.01, { shadow: false });
       }
 
-      // --- Cây xanh ---
+      // --- Trụ cào sisal cho mèo ---
+      var sc = get('scratch');
+      if (sc) {
+        var scx = (sc.x0 + sc.x1) / 2, scz = (sc.z0 + sc.z1) / 2;
+        box(R, mats.wood, sc.x0, sc.x1, 0, 0.04, sc.z0, sc.z1);
+        cyl(R, mats.sofa, 0.07, 0.86, scx, 0.04, scz, 24);
+        box(R, mats.wood, scx - 0.15, scx + 0.15, 0.9, 0.93, scz - 0.15, scz + 0.15);
+      }
+
+      // --- Cây xanh (loại không độc với mèo) ---
       ['plant', 'plant2'].forEach(function (id, n) {
         var pt = get(id), pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2, k = n ? 0.8 : 1;
         cyl(R, mats.pot, 0.15 * k + 0.02, 0.42, pcx, 0, pcz);
@@ -1011,6 +1039,7 @@
       ['wall', 'slat', 'backing', 'head', 'bed', 'duvet', 'accent', 'wood', 'wardrobe', 'sofa', 'rug'].forEach(function (k) {
         mats[k].color.copy(col(p[k]));
       });
+      mats.band.color.copy(col(p.head));
       paintFloor(p.floor);
       walls.forEach(function (g) { g.userData.mat.color.copy(mats.wall.color); });
       dirty = true;

@@ -42,13 +42,13 @@ describe("mặt bằng", () => {
     const { page, errors, close } = await open();
     try {
       assert.match(await planLabel(page), /sau cải tạo/);
-      assert.equal(await legendCount(page), 11);
+      assert.equal(await legendCount(page), 12);
       await page.click('[data-plan-tab="cu"]');
       assert.match(await planLabel(page), /hiện trạng/);
       assert.equal(await legendCount(page), 8);
       assert.equal(await page.getAttribute('[data-plan-tab="cu"]', "aria-pressed"), "true");
       await page.click('[data-plan-tab="moi"]');
-      assert.equal(await legendCount(page), 11);
+      assert.equal(await legendCount(page), 12);
       assert.deepEqual(errors, []);
     } finally { await close(); }
   });
@@ -108,10 +108,10 @@ describe("dự trù chi phí", () => {
   test("bỏ tick một hạng mục thì tổng trừ đúng khoảng của hạng mục đó", async () => {
     const { page, close } = await open();
     try {
-      assert.equal(await page.textContent("#costTotal"), "85–136 triệu");
+      assert.equal(await page.textContent("#costTotal"), "89–143 triệu");
       await page.locator('[data-cost][data-lo="16"] input').uncheck();
-      assert.equal(await page.textContent("#costTotal"), "69–112 triệu");
-      assert.equal(await page.textContent("#costCount"), "12/13 hạng mục");
+      assert.equal(await page.textContent("#costTotal"), "73–119 triệu");
+      assert.equal(await page.textContent("#costCount"), "13/14 hạng mục");
     } finally { await close(); }
   });
 });

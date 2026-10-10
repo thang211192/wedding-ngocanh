@@ -217,3 +217,10 @@
 .ev__notes { margin-top: var(--s-5); }
 .ev__notes h4 { font-size: 1rem; margin: 0 0 var(--s-2); }
 .ev__notes p { margin: 0; font-size: .92rem; color: var(--ink-2); }
+
+/* ---------- Tường & nhà có mèo ---------- */
+.walls .pill { margin-bottom: var(--s-3); }
+.walls__more { margin-top: var(--s-5); }
+.steps-mini, .cat-list { margin: var(--s-3) 0 0; padding-left: 1.2em; display: grid; gap: var(--s-3); color: var(--ink-2); font-size: .93rem; }
+.steps-mini li::marker { color: var(--rose); font-weight: 700; }
+.cat-list li::marker { color: var(--gold); }
