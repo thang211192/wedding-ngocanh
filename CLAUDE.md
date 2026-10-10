@@ -1,7 +1,7 @@
 # wedding-ngocanh
 
-Trang tĩnh ghi lộ trình cưới Thắng & Ngọc Anh (`index.html`), kèm trang phụ
-"Ăn gì ở Hà Nội" (`an-uong.html`). Không framework, không build step —
+Trang tĩnh ghi lộ trình cưới Thắng & Ngọc Anh (`index.html`), kèm hai trang phụ
+"Ăn gì ở Hà Nội" (`an-uong.html`) và "Phòng cưới" (`phong-cuoi.html`). Không framework, không build step —
 chỉ HTML + CSS + JavaScript thuần, mở thẳng bằng trình duyệt là chạy.
 
 ## Agent skills

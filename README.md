@@ -82,6 +82,20 @@ Trang phụ `an-uong.html`:
 | **Cung đường** | 7 buổi hẹn xếp sẵn theo mốc giờ: sáng phố cổ, chiều tối hồ Tây, tối kỷ niệm, hôm nhớ Nhật, ngày mưa đi cả nhà, tối thường ngày gặp giữa đường, cuối tuần ở khu Khương Thượng |
 | **Mẹo** | Nên / nên tránh khi đi ăn ở Hà Nội |
 
+Trang phụ `phong-cuoi.html` — bản thiết kế phòng cưới (bỏ vách nhôm kính, chuyển bếp ra ngoài):
+
+| Mục | Nội dung |
+|---|---|
+| **Mặt bằng** | SVG hiện trạng / sau cải tạo, có chú thích đánh số. Nhập số đo thật (rộng, dài, vị trí vách cũ) là vẽ lại |
+| **Phối cảnh 3D** | three.js r128 từ cdnjs. Xoay, phóng to, 5 góc nhìn đặt sẵn, chế độ buổi tối và trang trí ngày cưới. Tường quay về phía mắt nhìn tự mờ đi |
+| **Màu &amp; vật liệu** | 3 bảng màu (đổi luôn trên 3D) và bảng vật liệu cho từng bề mặt |
+| **Thi công · chi phí** | Thứ tự 4 tuần, bảng dự trù tick chọn được, lưu ý kỹ thuật khi bỏ bếp, yêu cầu cho bếp ngoài trời |
+| **Cần anh gửi** | Danh sách thông tin để vẽ bản thứ hai chính xác |
+
+Mặt bằng và 3D cùng vẽ từ một hàm `layout()` trong `assets/js/room.js`. Số đo và bảng màu
+lưu dưới khoá `wnc:room`. Không có mạng thì phần 3D báo lỗi nhẹ nhàng, mặt bằng vẫn chạy.
+Ảnh chụp hiện trạng **không** đưa vào repo vì trang được deploy công khai.
+
 ## Tính năng
 
 - **Đổi ngày cưới** ở đầu trang → toàn bộ mốc thời gian trong lộ trình tự tính lại, kèm đếm ngược.
@@ -134,12 +148,15 @@ Xoá dữ liệu bằng nút ở cuối trang.
 ```
 index.html              Lộ trình cưới — toàn bộ nội dung chính (viết tay)
 an-uong.html            Trang phụ ăn uống — SINH RA từ tools/, đừng sửa tay
+phong-cuoi.html         Trang phụ thiết kế phòng cưới (viết tay)
 tools/data.mjs          90 quán, 11 khu vực, 7 cung đường
 tools/build.mjs         Sinh an-uong.html từ data.mjs
 tests/                  Bộ test Playwright chạy trên trang đã dựng
 assets/css/style.css    Design tokens, layout, sáng/tối, bản in
 assets/js/app.js        Dùng chung cho cả hai trang: tính ngày, checklist, máy tính cỗ,
                         chi phí, lọc quán ăn (vanilla JS, không thư viện)
+assets/js/room.js       Riêng trang phòng cưới: mặt bằng SVG + 3D (three.js)
+assets/css/room.css     Riêng trang phòng cưới
 docs/                   Ghi chép cá nhân
 ```
 
