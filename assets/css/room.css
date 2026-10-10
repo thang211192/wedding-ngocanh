@@ -224,3 +224,16 @@
 .steps-mini, .cat-list { margin: var(--s-3) 0 0; padding-left: 1.2em; display: grid; gap: var(--s-3); color: var(--ink-2); font-size: .93rem; }
 .steps-mini li::marker { color: var(--rose); font-weight: 700; }
 .cat-list li::marker { color: var(--gold); }
+.cost-presets { margin-bottom: var(--s-4); width: fit-content; }
+.cost tr[data-tier="nang-cap"] td:nth-child(2)::after { content: " · nâng cấp sau"; color: var(--gold); font-size: .8em; font-weight: 600; }
+
+/* ---------- Chắn chói ---------- */
+.glare { margin-top: var(--s-6); }
+.glare .pill { margin-bottom: var(--s-3); }
+.glare .table-scroll { margin-top: var(--s-4); }
+.glare__table th[scope="row"] { white-space: nowrap; }
+.glare__table .num { white-space: nowrap; text-align: right; }
+.glare__more { margin-top: var(--s-4); }
+.glare__more h4 { font-size: 1rem; margin: 0 0 var(--s-2); }
+.glare__more p { margin: 0; font-size: .92rem; color: var(--ink-2); }
+@media (max-width: 640px) { .glare__table th[scope="row"] { white-space: normal; } }

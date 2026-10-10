@@ -18,7 +18,18 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var KEY = 'wnc:room';
-  var H = 3.0; // trần sau khi làm thạch cao
+  var H = 3.0; // chiều cao trần của bản đang dựng (build() gán lại theo bản)
+
+  // Hai bản thiết kế. "tk" (tiết kiệm) là bản chính: dùng lại giường cũ, giữ cửa 1, đồ mua sẵn.
+  // "full" là bản đầy đủ (đồ đóng, vách lam, sofa…) giữ để so sánh.
+  var VARIANTS = {
+    tk: {
+      name: 'Bản tiết kiệm', ceiling: 4.0, floor: 'tiles', bedW: 1.6, keepDoor1: true,
+      wardrobe: { len: 1.6, h: 2.0, depth: 0.5 }, deskW: 1.0,
+      drop: ['rug', 'sofa', 'table', 'rug2', 'plant', 'plant2', 'shoe', 'hooks', 'mirror']
+    },
+    full: { name: 'Bản đầy đủ', ceiling: 3.0, floor: 'spc', bedW: 1.8, keepDoor1: false, drop: [] }
+  };
 
   // Số đo thật theo gạch lát 40 × 40 cm: 7,2 × 20 viên, vách cũ ở viên thứ 10.
   var DEFAULT = { W: 2.88, L: 8, P: 4 };
@@ -62,6 +73,7 @@
   var state = {
     plan: 'moi',
     palette: PALETTES[saved.palette] ? saved.palette : 'kem',
+    variant: VARIANTS[saved.variant] ? saved.variant : 'tk',
     night: false,
     wedding: false
   };
@@ -71,14 +83,15 @@
     if (!isFinite(n)) return d;
     return Math.min(lim[1], Math.max(lim[0], Math.round(n * 100) / 100));
   }
-  function persist() { store.set({ v: VERSION, W: dims.W, L: dims.L, P: dims.P, palette: state.palette }); }
+  function persist() { store.set({ v: VERSION, W: dims.W, L: dims.L, P: dims.P, palette: state.palette, variant: state.variant }); }
   var vn = function (n) { return String(Math.round(n * 100) / 100).replace('.', ','); };
 
   /* ---------------------------------------------------------------------
      1. Bố cục
      --------------------------------------------------------------------- */
-  function layout(d) {
+  function layout(d, variant) {
     var W = d.W, L = d.L, P = d.P;
+    var V = VARIANTS[variant || state.variant], full = V === VARIANTS.full;
 
     // Ba cửa cùng nằm trên tường phía sân, đều 80 × 190 cm, có ô kính phía trên.
     // Đánh số 1 → 3 từ tường cửa sổ nhỏ sang tường bếp cũ (theo số đo đã gửi):
@@ -101,7 +114,7 @@
     // --- Phương án mới ---
     // Giường nằm gọn trên mảng tường giữa cửa 1 và cửa 2, chân giường nhìn vào TV.
     var tvC = (d1.to + d2.from) / 2;
-    var bed = { x0: W - 2.08, x1: W, z0: tvC - 0.9, z1: tvC + 0.9 };
+    var bed = { x0: W - (full ? 2.08 : 2.06), x1: W, z0: tvC - V.bedW / 2, z1: tvC + V.bedW / 2 };
     // Nửa bếp cũ — phương án "góc nắng cô dâu" (chấm điểm cao nhất trong 3 phương án):
     // tủ áo tường C, bàn trang điểm phủ trọn cửa sổ góc A–K, ghế văng có hộc ở góc C–K,
     // gương treo tường A cạnh bàn, lối từ giường ra cửa 3 để trống hoàn toàn.
@@ -133,10 +146,32 @@
       { id: 'hooks', n: 11, name: '', x0: 0, x1: 0.06, z0: Math.max(P + 0.1, d2.to + 0.05, d3.from - 0.45), z1: d3.from - 0.05, kind: 'hooks' }
     ];
 
+    // Bản tiết kiệm: bỏ đồ không bắt buộc, đổi sang đồ mua sẵn / dùng lại
+    if (!full) {
+      moi = moi.filter(function (it) { return V.drop.indexOf(it.id) < 0; });
+      moi.forEach(function (it) {
+        if (it.id === 'bed') it.name = 'Giường cũ 1m6, đầu giường gỗ (dùng lại), canh giữa mảng tường giữa cửa 1 và cửa 2';
+        if (it.id === 'ns1') it.name = 'Kệ gỗ treo nhỏ hai bên đầu giường (vài trăm nghìn), gầm để loa sub';
+        if (it.id === 'feat') { it.name = 'Mảng sơn màu tối sau đầu giường (thay vách lam)'; it.paint = true; }
+        if (it.id === 'wr') {
+          it.name = 'Tủ quần áo lắp sẵn ' + vn(V.wardrobe.len) + ' m, 4 cánh, gương toàn thân dán trong cánh tủ';
+          it.z1 = it.z0 + V.wardrobe.len; it.h = V.wardrobe.h; it.ready = true;
+          it.x0 = W - V.wardrobe.depth - 0.05; it.x1 = W - 0.05; // kê cách tường 5 cm cho thoáng
+        }
+        if (it.id === 'desk') {
+          it.name = 'Bàn trang điểm mua sẵn có gương, đặt dưới cửa sổ';
+          it.x0 = sinkC - V.deskW / 2; it.x1 = sinkC + V.deskW / 2;
+        }
+      });
+    }
     // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
     moi = moi.filter(function (it) { return it.id !== 'hooks' || it.z1 - it.z0 >= 0.2; });
     // Trụ cào chỉ vẽ khi lọt giữa tab đầu giường và vách cũ (tủ áo bắt đầu ngay sau vách)
     moi = moi.filter(function (it) { return it.id !== 'scratch' || it.z1 <= P + 0.05; });
+    // Đánh lại số chú thích cho liền mạch sau khi đã bỏ bớt món
+    var seen = {}, next = 1;
+    moi.forEach(function (it) { if (it.n && !seen[it.n]) seen[it.n] = next++; });
+    moi.forEach(function (it) { if (it.n) it.n = seen[it.n]; });
 
     // --- Hiện trạng ---
     var cu = [
@@ -153,7 +188,8 @@
     return {
       W: W, L: L, P: P, moi: moi, cu: cu, tvC: tvC, bed: bed, sinkC: sinkC, sofa: sofa, wardrobe: wardrobe,
       d3: d3,
-      openings: [w1, d2, d3].concat(common),
+      openings: [V.keepDoor1 ? d1 : w1, d2, d3].concat(common),
+      variant: full ? 'full' : 'tk', full: full, H: V.ceiling, floor: V.floor,
       openingsCu: [d1, d2, d3].concat(common)
     };
   }
@@ -181,14 +217,16 @@
     var vbW = (L + 2 * M) * S, vbH = (W + 2 * M) * S;
 
     var svg = el('svg', { viewBox: '0 0 ' + vbW + ' ' + vbH, role: 'img', class: 'plan__svg',
-      'aria-label': (mode === 'moi' ? 'Mặt bằng sau cải tạo' : 'Mặt bằng hiện trạng') + ', phòng ' + vn(W) + ' × ' + vn(L) + ' mét' });
+      'aria-label': (mode === 'moi' ? 'Mặt bằng sau cải tạo, ' + VARIANTS[lay.variant].name.toLowerCase() : 'Mặt bằng hiện trạng') + ', phòng ' + vn(W) + ' × ' + vn(L) + ' mét' });
 
     // Sàn
-    if (mode === 'cu') {
+    if (mode === 'cu' || lay.floor === 'tiles') { // hiện trạng, hoặc bản tiết kiệm giữ hai loại gạch cũ
       svg.appendChild(el('rect', { x: X(0), y: Y(W), width: P * S, height: W * S, class: 'pl-floor pl-floor--brown' }));
       svg.appendChild(el('rect', { x: X(P), y: Y(W), width: (L - P) * S, height: W * S, class: 'pl-floor pl-floor--teal' }));
     } else {
       svg.appendChild(el('rect', { x: X(0), y: Y(W), width: L * S, height: W * S, class: 'pl-floor pl-floor--wood' }));
+    }
+    if (mode === 'moi') {
       svg.appendChild(el('rect', { x: X(0), y: Y(W), width: P * S, height: W * S, class: 'pl-zone pl-zone--sleep' }));
       svg.appendChild(el('rect', { x: X(P), y: Y(W), width: (L - P) * S, height: W * S, class: 'pl-zone pl-zone--live' }));
     }
@@ -281,7 +319,7 @@
       svg.appendChild(el('text', { x: X(P + (L - P) / 2), y: dimY + 22, class: 'pl-small pl-center' }, 'ăn + bếp ' + vn(L - P) + ' m'));
     } else {
       svg.appendChild(el('text', { x: X(P / 2), y: dimY + 22, class: 'pl-zone-label pl-center' }, 'KHU NGỦ'));
-      svg.appendChild(el('text', { x: X(P + (L - P) / 2), y: dimY + 22, class: 'pl-zone-label pl-center' }, 'THAY ĐỒ · NGỒI NGHỈ'));
+      svg.appendChild(el('text', { x: X(P + (L - P) / 2), y: dimY + 22, class: 'pl-zone-label pl-center' }, lay.full ? 'THAY ĐỒ · NGỒI NGHỈ' : 'THAY ĐỒ · TRANG ĐIỂM'));
     }
     var dimX = X(0) - T * S / 2 - 30;
     svg.appendChild(el('line', { x1: dimX, y1: Y(W), x2: dimX, y2: Y(0), class: 'pl-dim' }));
@@ -312,15 +350,23 @@
     if (area) area.textContent = vn(Math.round(W * L * 10) / 10) + ' m²';
   }
 
+  function updateCaption() {
+    var cap = $('#planCaption');
+    if (!cap) return;
+    cap.textContent = state.plan !== 'moi'
+      ? 'Hiện trạng như mình hiểu từ ảnh và video. Chỗ nào sai anh báo để vẽ lại.'
+      : state.variant === 'full'
+        ? 'Bản đầy đủ: bỏ vách, bếp ra ngoài, cửa 1 thành cửa sổ, cả phòng lát một loại sàn gỗ.'
+        : 'Bản tiết kiệm: bỏ vách, bếp ra ngoài, giữ nguyên cửa 1 và hai loại gạch cũ.';
+  }
+
   function initPlan() {
     $$('[data-plan-tab]').forEach(function (b) {
       b.addEventListener('click', function () {
         state.plan = b.getAttribute('data-plan-tab');
         $$('[data-plan-tab]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
         var cap = $('#planCaption');
-        if (cap) cap.textContent = state.plan === 'moi'
-          ? 'Sau cải tạo: bỏ vách, bếp ra ngoài, cả phòng lát một loại sàn gỗ.'
-          : 'Hiện trạng như mình hiểu từ ảnh và video. Chỗ nào sai anh báo để vẽ lại.';
+        updateCaption();
         renderPlan();
       });
     });
@@ -393,13 +439,14 @@
     var out = $('#costTotal'), outN = $('#costCount');
     var update = function () {
       var lo = 0, hi = 0, n = 0;
-      rows.forEach(function (r) {
+      var shown = rows.filter(function (r) { return !r.closest('table').hidden; });
+      shown.forEach(function (r) {
         var cb = $('input', r);
         r.setAttribute('data-off', String(!cb.checked));
         if (cb.checked) { lo += +r.getAttribute('data-lo'); hi += +r.getAttribute('data-hi'); n++; }
       });
-      if (out) out.textContent = lo + '–' + hi + ' triệu';
-      if (outN) outN.textContent = n + '/' + rows.length + ' hạng mục';
+      if (out) out.textContent = vn(lo) + '–' + vn(hi) + ' triệu';
+      if (outN) outN.textContent = n + '/' + shown.length + ' hạng mục';
     };
     rows.forEach(function (r) { $('input', r).addEventListener('change', update); });
     update();
@@ -525,6 +572,26 @@
       floorTex.needsUpdate = true;
     }
 
+    // Gạch lát 40 × 40 cũ: nửa phòng ngủ tông nâu, nửa bếp tông xanh ngọc (bản tiết kiệm giữ nguyên sàn)
+    function tileTexture(base, motif) {
+      var cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      var c = cv.getContext('2d');
+      c.fillStyle = base; c.fillRect(0, 0, 128, 128);
+      c.fillStyle = motif;
+      c.beginPath(); c.moveTo(64, 14); c.lineTo(114, 64); c.lineTo(64, 114); c.lineTo(14, 64); c.closePath(); c.fill();
+      c.fillStyle = base;
+      c.beginPath(); c.moveTo(64, 34); c.lineTo(94, 64); c.lineTo(64, 94); c.lineTo(34, 64); c.closePath(); c.fill();
+      c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 3; c.strokeRect(1.5, 1.5, 125, 125);
+      var t = new T3.CanvasTexture(cv);
+      t.wrapS = t.wrapT = T3.RepeatWrapping;
+      t.encoding = T3.sRGBEncoding;
+      return t;
+    }
+    var tileBrown = std('#ffffff', { roughness: 0.35 }), tileTeal = std('#ffffff', { roughness: 0.35 });
+    tileBrown.map = tileTexture('#e6c3ad', '#b9826a');
+    tileTeal.map = tileTexture('#cfe8e2', '#5fa89c');
+
     // Chữ Hỷ cho chế độ "trang trí ngày cưới"
     function hyTexture() {
       var cv = document.createElement('canvas');
@@ -581,7 +648,7 @@
         giuong: { target: [W - 0.4, 1.0, lay.bed.z0 + 0.9], pos: [0.35, 1.55, lay.bed.z0 + 0.9 + 0.15] },
         nhinra: { target: [0.9, 0.9, L - 0.9], pos: [W - 0.7, 1.6, Math.max(0.5, lay.bed.z0 - 0.2)] },
         thaydo: { target: [W - 0.9, 1.0, L - 0.6], pos: [0.45, 1.6, P + 0.1] },
-        // đứng phía đầu giường nhìn ra cửa 1 (đã thành cửa sổ) và mảng tường TV
+        // đứng phía đầu giường nhìn ra cửa 1 và mảng tường TV
         cua1: { target: [0, 1.25, 1.0], pos: [W - 0.25, 1.55, 2.35] }
       };
     }
@@ -682,6 +749,7 @@
 
     function build() {
       var lay = layout(dims), W = lay.W, L = lay.L, P = lay.P;
+      H = lay.H; // bản tiết kiệm không đóng trần thạch cao: trần thô 4 m
       if (room) {
         scene.remove(room);
         room.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
@@ -694,9 +762,17 @@
 
       // Nền ngoài + sàn
       box(room, mats.ground, -6, W + 6, -0.08, -0.06, -6, L + 6, { shadow: false });
-      var floor = box(room, mats.floor, 0, W, -0.05, 0, 0, L);
-      floor.castShadow = false;
-      floorTex.repeat.set(W / 1.2, L / 1.2);
+      if (lay.floor === 'tiles') {
+        [[tileBrown, 0, P], [tileTeal, P, L]].forEach(function (f) {
+          var m = box(room, f[0], 0, W, -0.05, 0, f[1], f[2]);
+          m.castShadow = false;
+          f[0].map.repeat.set(W / 0.4, (f[2] - f[1]) / 0.4);
+        });
+      } else {
+        var floor = box(room, mats.floor, 0, W, -0.05, 0, 0, L);
+        floor.castShadow = false;
+        floorTex.repeat.set(W / 1.2, L / 1.2);
+      }
 
       // Tường
       var t = 0.12;
@@ -751,10 +827,10 @@
         });
         // Len chân tường gỗ + đường LED hắt trần
         var inset = 0.012;
-        if (k === 'A') { box(g, mats.wood, 0, inset, 0, 0.08, 0, L, { shadow: false }); box(g, mats.led, 0, 0.02, H - 0.04, H - 0.02, 0.05, L - 0.05, { shadow: false }); }
-        if (k === 'C') { box(g, mats.wood, W - inset, W, 0, 0.08, 0, L, { shadow: false }); box(g, mats.led, W - 0.02, W, H - 0.04, H - 0.02, 0.05, L - 0.05, { shadow: false }); }
-        if (k === 'B') { box(g, mats.wood, 0, W, 0, 0.08, 0, inset, { shadow: false }); box(g, mats.led, 0.05, W - 0.05, H - 0.04, H - 0.02, 0, 0.02, { shadow: false }); }
-        if (k === 'K') { box(g, mats.wood, 0, W, 0, 0.08, L - inset, L, { shadow: false }); box(g, mats.led, 0.05, W - 0.05, H - 0.04, H - 0.02, L - 0.02, L, { shadow: false }); }
+        if (k === 'A') { box(g, mats.wood, 0, inset, 0, 0.08, 0, L, { shadow: false }); if (lay.full) box(g, mats.led, 0, 0.02, H - 0.04, H - 0.02, 0.05, L - 0.05, { shadow: false }); }
+        if (k === 'C') { box(g, mats.wood, W - inset, W, 0, 0.08, 0, L, { shadow: false }); if (lay.full) box(g, mats.led, W - 0.02, W, H - 0.04, H - 0.02, 0.05, L - 0.05, { shadow: false }); }
+        if (k === 'B') { box(g, mats.wood, 0, W, 0, 0.08, 0, inset, { shadow: false }); if (lay.full) box(g, mats.led, 0.05, W - 0.05, H - 0.04, H - 0.02, 0, 0.02, { shadow: false }); }
+        if (k === 'K') { box(g, mats.wood, 0, W, 0, 0.08, L - inset, L, { shadow: false }); if (lay.full) box(g, mats.led, 0.05, W - 0.05, H - 0.04, H - 0.02, L - 0.02, L, { shadow: false }); }
       });
       // Chân tường thấp luôn hiện (để khi ẩn tường vẫn thấy ranh giới)
       box(room, mats.wall, -t, 0, 0, 0.14, -t, L + t, { shadow: false });
@@ -793,9 +869,11 @@
         pane(mats.glass, o.from, o.to, o.bottom, o.top, 0.01);
         return;
       }
-      // Ở phương án mới, cửa nào còn lại cũng là cửa đôi gỗ kính (cửa 2, cửa 3).
+      // Cửa gỗ kính: cửa 2, cửa 3 hai cánh; cửa 1 (bản tiết kiệm giữ nguyên) một cánh
       var mid = (o.from + o.to) / 2;
-      [[o.from, mid], [mid, o.to]].forEach(function (lf) {
+      var leaves = o.kind === 'door2' ? [[o.from, mid], [mid, o.to]] : [[o.from, o.to]];
+      if (o.kind === 'door') pane(mats.metal, o.to - 0.1, o.to - 0.06, 0.95, 1.12, 0.08); // tay nắm
+      leaves.forEach(function (lf) {
         pane(mats.doorWood, lf[0] + 0.01, lf[1] - 0.01, 0, o.top, 0.045);
         for (var r = 0; r < 3; r++) {
           var y0 = 0.85 + r * 0.33;
@@ -815,21 +893,26 @@
 
       // --- Vách lam gỗ đầu giường ---
       var f = get('feat');
-      box(R, mats.backing, W - 0.02, W, 0.08, 2.7, f.z0, f.z1, { shadow: false });
-      for (var z = f.z0 + 0.03; z < f.z1 - 0.03; z += 0.1) {
-        box(R, mats.slat, W - 0.055, W - 0.02, 0.08, 2.7, z, z + 0.045);
+      box(R, mats.backing, W - 0.02, W, 0.08, f.paint ? 2.4 : 2.7, f.z0, f.z1, { shadow: false });
+      if (!f.paint) { // bản tiết kiệm chỉ sơn mảng tối, không lam, không LED
+        for (var z = f.z0 + 0.03; z < f.z1 - 0.03; z += 0.1) {
+          box(R, mats.slat, W - 0.055, W - 0.02, 0.08, 2.7, z, z + 0.045);
+        }
+        var ledTop = box(R, mats.led, W - 0.07, W - 0.06, 2.68, 2.7, f.z0, f.z1, { shadow: false });
+        ledTop.userData.led = true;
       }
-      var ledTop = box(R, mats.led, W - 0.07, W - 0.06, 2.68, 2.7, f.z0, f.z1, { shadow: false });
-      ledTop.userData.led = true;
 
       // --- Giường ---
       var b = lay.bed;
       var bx0 = b.x0, bx1 = b.x1 - 0.1, bz0 = b.z0, bz1 = b.z1, bcx = (bx0 + bx1) / 2, bcz = (bz0 + bz1) / 2;
-      box(R, mats.head, b.x1 - 0.1, b.x1 - 0.06, 0.1, 1.2, bz0 - 0.1, bz1 + 0.1); // tấm đầu giường
-      for (var hz = bz0; hz <= bz1 + 0.001; hz += (bz1 - bz0 + 0.2) / 6) {
-        box(R, mats.backing, b.x1 - 0.105, b.x1 - 0.1, 0.12, 1.18, hz - 0.1, hz - 0.095, { shadow: false });
+      var frameMat = lay.full ? mats.head : mats.doorWood; // giường cũ: khung và đầu giường gỗ
+      box(R, frameMat, b.x1 - 0.1, b.x1 - 0.06, 0.1, lay.full ? 1.2 : 1.0, bz0 - (lay.full ? 0.1 : 0.03), bz1 + (lay.full ? 0.1 : 0.03)); // tấm đầu giường
+      if (lay.full) {
+        for (var hz = bz0; hz <= bz1 + 0.001; hz += (bz1 - bz0 + 0.2) / 6) {
+          box(R, mats.backing, b.x1 - 0.105, b.x1 - 0.1, 0.12, 1.18, hz - 0.1, hz - 0.095, { shadow: false });
+        }
       }
-      box(R, mats.head, bx0, bx1, 0.06, 0.34, bz0, bz1); // khung bọc vải chống mèo cào
+      box(R, frameMat, bx0, bx1, 0.06, 0.34, bz0, bz1); // khung giường
       box(R, mats.bed, bx0 + 0.02, bx1, 0.34, 0.56, bz0 + 0.02, bz1 - 0.02); // nệm
       var duvet = box(R, mats.duvet, bx0, bx1 - 0.55, 0.3, 0.6, bz0 - 0.01, bz1 + 0.01);
       duvet.userData.role = 'duvet';
@@ -870,6 +953,7 @@
         box(R, mats.wood, n.x0, n.x1 - 0.02, 0.38, 0.56, n.z0, n.z1);
         box(R, mats.backing, n.x0 - 0.001, n.x0, 0.47, 0.475, n.z0 + 0.04, n.z1 - 0.04, { shadow: false });
         var pz = (n.z0 + n.z1) / 2, px = (n.x0 + n.x1) / 2 - 0.02;
+        if (!lay.full) { box(R, mats.accent, n.x0 + 0.08, n.x0 + 0.26, 0.56, 0.6, n.z0 + 0.08, n.z0 + 0.22); return; } // bản tiết kiệm: kệ trơn, không đèn thả
         cyl(R, mats.black, 0.004, H - 1.12, px, 1.12, pz, 6).castShadow = false;
         var bulb = new T3.Mesh(new T3.SphereGeometry(0.09, 24, 16), mats.bulb);
         bulb.position.set(px, 1.05, pz);
@@ -893,12 +977,25 @@
       // --- Thảm ---
       ['rug', 'rug2'].forEach(function (id) {
         var r = get(id);
+        if (!r) return;
         var m = box(R, mats.rug, r.x0, r.x1, 0, 0.012, r.z0, r.z1, { shadow: false });
         m.receiveShadow = true;
       });
 
       // --- Tủ quần áo cửa lùa ---
       var w = get('wr');
+      if (w.ready) {
+        // tủ mua sẵn: 3 cánh mở, cao 2 m, không hộc nóc
+        box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0.1, w.h, w.z0, w.z1);
+        var rw = (w.z1 - w.z0) / 4;
+        box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0, 0.1, w.z0 + 0.03, w.z0 + 0.06); // chân kê
+        box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0, 0.1, w.z1 - 0.06, w.z1 - 0.03);
+        for (var rk = 0; rk < 4; rk++) {
+          var rz = w.z0 + rk * rw, hinge = rk % 2 ? rz + 0.03 : rz + rw - 0.05; // tay nắm ở giữa mỗi cặp cánh
+          box(R, rk === 1 || rk === 2 ? mats.wood : mats.wardrobe, w.x0, w.x0 + 0.02, 0.12, w.h - 0.02, rz + 0.004, rz + rw - 0.004);
+          box(R, mats.metal, w.x0 - 0.02, w.x0, 1.0, 1.3, hinge, hinge + 0.02, { shadow: false });
+        }
+      } else {
       box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0.06, H - 0.02, w.z0, w.z1);
       var nPanel = w.z1 - w.z0 > 1.8 ? 3 : 2, pw = (w.z1 - w.z0) / nPanel;
       for (var k = 0; k < nPanel; k++) {
@@ -910,14 +1007,17 @@
       }
       var toe = box(R, mats.led, w.x0 + 0.03, w.x0 + 0.05, 0.05, 0.06, w.z0, w.z1, { shadow: false }); // LED hắt chân tủ
       toe.userData.led = true;
+      }
 
       // --- Gương toàn thân ---
-      var mi = get('mirror');
-      // lưng gương màu sáng (khi tường sân mờ đi, nhìn từ ngoài không thành một tấm sẫm)
-      box(R, mats.frame, 0, 0.025, 0.3, 2.0, mi.z0, mi.z1, { shadow: false });
-      box(R, mats.mirror, 0.025, 0.03, 0.32, 1.98, mi.z0 + 0.02, mi.z1 - 0.02, { shadow: false });
-      [[0.3, 0.32], [1.98, 2.0]].forEach(function (yy) { box(R, mats.metal, 0.02, 0.035, yy[0], yy[1], mi.z0, mi.z1, { shadow: false }); });
-      [mi.z0, mi.z1 - 0.02].forEach(function (zz) { box(R, mats.metal, 0.02, 0.035, 0.3, 2.0, zz, zz + 0.02, { shadow: false }); });
+      var mi = get('mirror'); // bản tiết kiệm: gương dán trong cánh tủ, không có gương treo tường
+      if (mi) {
+        // lưng gương màu sáng (khi tường sân mờ đi, nhìn từ ngoài không thành một tấm sẫm)
+        box(R, mats.frame, 0, 0.025, 0.3, 2.0, mi.z0, mi.z1, { shadow: false });
+        box(R, mats.mirror, 0.025, 0.03, 0.32, 1.98, mi.z0 + 0.02, mi.z1 - 0.02, { shadow: false });
+        [[0.3, 0.32], [1.98, 2.0]].forEach(function (yy) { box(R, mats.metal, 0.02, 0.035, yy[0], yy[1], mi.z0, mi.z1, { shadow: false }); });
+        [mi.z0, mi.z1 - 0.02].forEach(function (zz) { box(R, mats.metal, 0.02, 0.035, 0.3, 2.0, zz, zz + 0.02, { shadow: false }); });
+      }
 
       // --- Bàn trang điểm + ghế + gương tròn ---
       var d = get('desk'), dcx = (d.x0 + d.x1) / 2;
@@ -938,7 +1038,8 @@
       box(R, mats.sheer, wk.from - 0.05, wk.to + 0.05, wk.top - 0.25, wk.top + 0.08, L - 0.1, L - 0.02, { shadow: false });
 
       // --- Ghế văng có hộc (lưng tựa tường bếp cũ) + bàn trà + đèn đọc sách ---
-      var s = get('sofa'), smz = (s.z0 + s.z1) / 2;
+      var s = get('sofa');
+      if (s) {
       box(R, mats.sofa, s.x0, s.x1, 0.06, 0.44, s.z0 + 0.05, s.z1 - 0.02);
       box(R, mats.backing, s.x0 + 0.02, s.x1 - 0.02, 0.06, 0.1, s.z0 + 0.04, s.z0 + 0.06, { shadow: false }); // khe hộc
       box(R, mats.sofa, s.x0, s.x1, 0.06, 0.86, s.z1 - 0.18, s.z1 - 0.02);
@@ -964,12 +1065,13 @@
       fl.position.set(W - 0.3, 1.25, lz);
       scene.add(fl);
       nightLights.push(fl);
+      }
 
       // --- Tủ giày + móc khăn cạnh cửa 3 ---
       var sh = get('shoe');
-      box(R, mats.wardrobe, sh.x0, sh.x1, 0.1, 0.88, sh.z0, sh.z1);
-      box(R, mats.wood, sh.x0, sh.x1 + 0.01, 0.88, 0.91, sh.z0, sh.z1);
-      for (var sl = 0; sl < 4; sl++) { // khe thoáng trên cánh lật
+      if (sh) box(R, mats.wardrobe, sh.x0, sh.x1, 0.1, 0.88, sh.z0, sh.z1);
+      if (sh) box(R, mats.wood, sh.x0, sh.x1 + 0.01, 0.88, 0.91, sh.z0, sh.z1);
+      for (var sl = 0; sh && sl < 4; sl++) { // khe thoáng trên cánh lật
         box(R, mats.backing, sh.x1, sh.x1 + 0.003, 0.6 + sl * 0.05, 0.62 + sl * 0.05, sh.z0 + 0.1, sh.z1 - 0.1, { shadow: false });
       }
       var hk = get('hooks');
@@ -990,7 +1092,9 @@
 
       // --- Cây xanh (loại không độc với mèo) ---
       ['plant', 'plant2'].forEach(function (id, n) {
-        var pt = get(id), pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2, k = n ? 0.8 : 1;
+        var pt = get(id);
+        if (!pt) return;
+        var pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2, k = n ? 0.8 : 1;
         cyl(R, mats.pot, 0.15 * k + 0.02, 0.42, pcx, 0, pcz);
         [[0, 0.95, 0, 0.26], [0.08, 1.2, 0.05, 0.2], [-0.07, 1.15, -0.06, 0.19], [0.02, 1.38, -0.02, 0.15]].forEach(function (l) {
           add(R, new T3.SphereGeometry(l[3] * k, 16, 12), mats.leaf, pcx + l[0] * k, 0.42 + (l[1] - 0.42) * k, pcz + l[2] * k);
@@ -1001,10 +1105,11 @@
       // --- Rèm voan chia khu: ray âm trần (không vẽ vì không có trần), rèm dồn gọn sát tường phía sân ---
       var d3o = lay.d3;
       if (!(P > d3o.from - 0.1 && P < d3o.to + 0.1)) {
-      drape(R, 'x', P, 0.04, 0.4, 0.06, H - 0.04);
+      var ch = lay.full ? H - 0.04 : Math.min(H - 0.04, 2.6); // bản đầy đủ: ray âm trần; bản tiết kiệm: thanh treo ở 2,6 m
+      drape(R, 'x', P, 0.04, 0.4, 0.06, ch);
       // lớp rèm vải dày cạnh lớp voan: ban đêm kéo ra để điều hoà chỉ làm mát khu ngủ
-      var heavy = new T3.Mesh(new T3.BoxGeometry(0.28, H - 0.1, 0.1), mats.head);
-      heavy.position.set(0.56, (H - 0.04 + 0.06) / 2, P);
+      var heavy = new T3.Mesh(new T3.BoxGeometry(0.28, ch - 0.06, 0.1), mats.head);
+      heavy.position.set(0.56, (ch + 0.06) / 2, P);
       R.add(heavy);
       }
 
@@ -1112,7 +1217,35 @@
     };
   }
 
+  // Chuyển giữa bản tiết kiệm và bản đầy đủ: mặt bằng, 3D và bảng chi phí cùng đổi
+  function setVariant(v, quiet) {
+    if (!VARIANTS[v]) return;
+    var changed = v !== state.variant;
+    if (!changed && !quiet) return; // bấm lại nút đang chọn: giữ nguyên các dấu tick anh đã chọn
+    state.variant = v;
+    persist();
+    $$('[data-variant]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-variant') === v)); });
+    applyCostPreset(v);
+    updateCaption();
+    if (quiet) return;
+    renderPlan();
+    if (three) three.rebuild();
+  }
+
+  function applyCostPreset(v) {
+    $$('[data-cost-table]').forEach(function (t) { t.hidden = t.getAttribute('data-cost-table') !== v; });
+    $$('[data-cost-table="' + v + '"] [data-cost]').forEach(function (r) {
+      var cb = $('input', r);
+      cb.checked = r.getAttribute('data-tier') !== 'nang-cap'; // hạng mục "nâng cấp sau" mặc định không tính
+      cb.dispatchEvent(new Event('change'));
+    });
+  }
+
   function initControls() {
+    $$('[data-variant]').forEach(function (b) {
+      b.addEventListener('click', function () { setVariant(b.getAttribute('data-variant')); });
+    });
+    setVariant(state.variant, true);
     $$('[data-cam]').forEach(function (b) {
       b.addEventListener('click', function () {
         if (!three) return;

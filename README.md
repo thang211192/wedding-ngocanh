@@ -82,7 +82,9 @@ Trang phụ `an-uong.html`:
 | **Cung đường** | 7 buổi hẹn xếp sẵn theo mốc giờ: sáng phố cổ, chiều tối hồ Tây, tối kỷ niệm, hôm nhớ Nhật, ngày mưa đi cả nhà, tối thường ngày gặp giữa đường, cuối tuần ở khu Khương Thượng |
 | **Mẹo** | Nên / nên tránh khi đi ăn ở Hà Nội |
 
-Trang phụ `phong-cuoi.html` — bản thiết kế phòng cưới (bỏ vách nhôm kính, chuyển bếp ra ngoài):
+Trang phụ `phong-cuoi.html` — bản thiết kế phòng cưới (bỏ vách nhôm kính, chuyển bếp ra ngoài).
+Có hai bản chuyển qua lại được: **bản tiết kiệm** (mặc định, khoảng 18–33 triệu: giường cũ, giữ cửa 1, đồ mua sẵn, giữ sàn gạch, chưa đóng trần)
+và **bản đầy đủ** (khoảng 89–143 triệu). Mặt bằng, 3D và bảng chi phí đổi theo bản đang chọn (`VARIANTS` trong `room.js`).
 
 | Mục | Nội dung |
 |---|---|
