@@ -108,10 +108,10 @@ describe("dự trù chi phí", () => {
   test("bỏ tick một hạng mục thì tổng trừ đúng khoảng của hạng mục đó", async () => {
     const { page, close } = await open();
     try {
-      assert.equal(await page.textContent("#costTotal"), "82–132 triệu");
+      assert.equal(await page.textContent("#costTotal"), "102–157 triệu");
       await page.locator('[data-cost][data-lo="16"] input').uncheck();
-      assert.equal(await page.textContent("#costTotal"), "66–108 triệu");
-      assert.equal(await page.textContent("#costCount"), "12/13 hạng mục");
+      assert.equal(await page.textContent("#costTotal"), "86–133 triệu");
+      assert.equal(await page.textContent("#costCount"), "13/14 hạng mục");
     } finally { await close(); }
   });
 });

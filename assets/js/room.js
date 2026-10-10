@@ -86,43 +86,54 @@
     //   cửa 2 hai cánh · cửa 3 cách tường bếp cũ 220 cm, là lối ra nhà tắm.
     var d1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 1' };
     var d2 = { wall: 'A', from: 2.95, to: 3.75, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', label: 'Cửa 2' };
-    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 3 · ra nhà tắm' };
+    // Cửa 3 nên đặt bản lề ở mép phía tường bếp cũ: cánh mở ra xa người đi từ giường tới.
+    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door', hinge: 'to', label: 'Cửa 3 · ra nhà tắm' };
     // Phương án mới: xây bậu nửa dưới cửa 1, thành cửa sổ (giữ ánh sáng, bớt một lối ra ngoài).
     var w1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0.9, top: 2.3, kind: 'window', label: 'Cửa 1 → cửa sổ' };
     var winB = { wall: 'B', from: W / 2 - 0.4, to: W / 2 + 0.4, bottom: 1.9, top: 2.5, kind: 'window' };
-    var sinkC = Math.min(W - 1.2, Math.max(1.1, W * 0.5));
-    var winK = { wall: 'K', from: sinkC - 0.45, to: sinkC + 0.45, bottom: 1.15, top: 1.85, kind: 'window' };
-    var ventK = { wall: 'K', from: Math.max(0.3, sinkC - 1.1), to: Math.max(0.75, sinkC - 0.65), bottom: 2.35, top: 2.75, kind: 'window' };
-    var common = [d2, d3, winB, winK, ventK];
+    // Cửa sổ chỗ bồn rửa cũ: 80 × 100 cm, ở góc phía tường sân (cạnh cửa 3). Bậu ước 1,1 m.
+    var winK = { wall: 'K', from: 0.55, to: 1.35, bottom: 1.1, top: 2.1, kind: 'window' };
+    var sinkC = (winK.from + winK.to) / 2;
+    var ventK = { wall: 'K', from: 1.6, to: 2.1, bottom: 2.35, top: 2.75, kind: 'window' };
+    var common = [winB, winK, ventK];
+    // Hiện trạng chưa biết bản lề cửa 3 ở mép nào nên vẽ mặc định; bản lề phía tường bếp chỉ là đề xuất.
+    var d3cu = { wall: 'A', from: d3.from, to: d3.to, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: d3.label };
 
     // --- Phương án mới ---
     // Giường nằm gọn trên mảng tường giữa cửa 1 và cửa 2, chân giường nhìn vào TV.
     var tvC = (d1.to + d2.from) / 2;
     var bed = { x0: W - 2.08, x1: W, z0: tvC - 0.9, z1: tvC + 0.9 };
-    var wrLen = Math.max(1.2, Math.min(2.4, L - P - 1.6));
-    var wardrobe = { x0: W - 0.6, x1: W, z0: P + 0.15, z1: P + 0.15 + wrLen };
-    var sofa = { x0: 0, x1: 0.8, z0: d3.to + 0.2, z1: Math.min(d3.to + 1.65, L - 0.62) };
-    var sofaC = (sofa.z0 + sofa.z1) / 2;
-    var deskW = Math.min(1.2, W - 1.0);
+    // Nửa bếp cũ — phương án "góc nắng cô dâu" (chấm điểm cao nhất trong 3 phương án):
+    // tủ áo tường C, bàn trang điểm phủ trọn cửa sổ góc A–K, ghế văng có hộc ở góc C–K,
+    // gương treo tường A cạnh bàn, lối từ giường ra cửa 3 để trống hoàn toàn.
+    var wrLen = Math.max(0.6, Math.min(2.3, L - P - 1.7)); // chừa ≥ 1,6 m cho góc trà ở cuối phòng
+    var wardrobe = { x0: W - 0.6, x1: W, z0: P + 0.1, z1: P + 0.1 + wrLen };
+    var desk = { x0: winK.from - 0.15, x1: winK.to + 0.13, z0: L - 0.45, z1: L };
+    var sofa = { x0: Math.max(desk.x1 + 0.06, W - 1.34), x1: W - 0.04, z0: L - 0.75, z1: L };
     var featZ0 = Math.max(0.05, bed.z0 - 0.65), featZ1 = Math.min(P - 0.05, bed.z1 + 0.65);
 
     var moi = [
-      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc nỉ, nằm gọn giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
+      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc nỉ, canh giữa mảng tường giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
       { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2)', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
       { id: 'ns2', n: 2, name: '', x0: W - 0.45, x1: W, z0: bed.z1 + 0.05, z1: bed.z1 + 0.5, kind: 'wood' },
       { id: 'feat', n: 3, name: 'Vách lam gỗ + LED hắt sau đầu giường', x0: W - 0.06, x1: W, z0: featZ0, z1: featZ1, kind: 'feat' },
-      { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm, ngay dưới điều hoà', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
+      { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm giữa cửa 1 và cửa 2', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
       { id: 'rug', n: 5, name: 'Thảm trải dưới giường', x0: Math.max(0.15, bed.x0 - 0.5), x1: W - 0.75, z0: bed.z0 - 0.35, z1: bed.z1 + 0.35, kind: 'rug' },
-      { id: 'wr', n: 6, name: 'Tủ quần áo cửa lùa ' + vn(wrLen) + ' m, kịch trần', x0: wardrobe.x0, x1: wardrobe.x1, z0: wardrobe.z0, z1: wardrobe.z1, kind: 'wardrobe' },
-      { id: 'mirror', n: 7, name: 'Gương soi toàn thân', x0: W - 0.08, x1: W, z0: wardrobe.z1 + 0.15, z1: Math.min(L - 0.6, wardrobe.z1 + 0.65), kind: 'mirror' },
-      { id: 'desk', n: 8, name: 'Bàn trang điểm / làm việc dưới cửa sổ', x0: sinkC - deskW / 2, x1: sinkC + deskW / 2, z0: L - 0.5, z1: L, kind: 'wood' },
-      { id: 'stool', n: 0, name: '', x0: sinkC - 0.2, x1: sinkC + 0.2, z0: L - 0.8, z1: L - 0.4, kind: 'stool' },
-      { id: 'sofa', n: 9, name: 'Sofa 2 chỗ + bàn trà tròn', x0: sofa.x0, x1: sofa.x1, z0: sofa.z0, z1: sofa.z1, kind: 'sofa' },
-      { id: 'table', n: 0, name: '', x0: 0.95, x1: 1.45, z0: sofaC - 0.4, z1: sofaC + 0.1, kind: 'round' },
-      { id: 'rug2', n: 0, name: '', x0: 0.3, x1: Math.min(1.9, W - 0.7), z0: sofa.z0 - 0.1, z1: sofa.z1 + 0.1, kind: 'rug' },
-      { id: 'plant', n: 10, name: 'Cây xanh cạnh cửa sổ mới (cửa 1 cũ)', x0: 0.08, x1: 0.48, z0: 0.08, z1: 0.48, kind: 'plant' },
-      { id: 'shoe', n: 11, name: 'Tủ giày thấp + móc khăn cạnh cửa 3', x0: 0, x1: 0.35, z0: P + 0.15, z1: Math.min(d3.from - 0.1, P + 0.85), kind: 'wood' }
+      { id: 'wr', n: 6, name: 'Tủ quần áo cửa lùa ' + vn(wrLen) + ' m, hộc nóc kịch trần 3 m', x0: wardrobe.x0, x1: wardrobe.x1, z0: wardrobe.z0, z1: wardrobe.z1, kind: 'wardrobe' },
+      { id: 'mirror', n: 7, name: 'Gương toàn thân treo tường, cạnh bàn trang điểm', x0: 0, x1: 0.05, z0: L - 1.1, z1: L - 0.55, kind: 'mirror' },
+      { id: 'desk', n: 8, name: 'Bàn trang điểm / làm việc dưới cửa sổ 80 × 100', x0: desk.x0, x1: desk.x1, z0: desk.z0, z1: desk.z1, kind: 'wood' },
+      { id: 'stool', n: 0, name: '', x0: sinkC - 0.22, x1: sinkC + 0.22, z0: L - 0.9, z1: L - 0.5, kind: 'stool' },
+      { id: 'sofa', n: 9, name: 'Ghế văng 2 chỗ có hộc + bàn trà Ø42 + đèn đọc sách', x0: sofa.x0, x1: sofa.x1, z0: sofa.z0, z1: sofa.z1, kind: 'sofa' },
+      { id: 'table', n: 0, name: '', x0: W - 1.13, x1: W - 0.71, z0: L - 1.55, z1: L - 1.13, kind: 'round' },
+      { id: 'rug2', n: 0, name: '', x0: Math.max(desk.x1 + 0.05, W - 1.55), x1: W - 0.1, z0: Math.max(wardrobe.z1 + 0.05, L - 1.75), z1: L - 0.1, kind: 'rug' },
+      { id: 'plant', n: 10, name: 'Cây xanh ×2: cạnh cửa sổ mới và góc bàn trang điểm', x0: 0.08, x1: 0.48, z0: 0.08, z1: 0.48, kind: 'plant' },
+      { id: 'plant2', n: 10, name: '', x0: 0.03, x1: 0.35, z0: L - 0.4, z1: L - 0.05, kind: 'plant' },
+      { id: 'shoe', n: 11, name: 'Tủ giày + móc khăn sát cửa 3 (lối ra nhà tắm)', x0: 0, x1: 0.32, z0: Math.max(d3.to + 0.1, P + 0.1), z1: Math.min(Math.max(d3.to + 1.0, P + 1.0), L - 1.15), kind: 'wood' }, // dừng trước gương
+      { id: 'hooks', n: 11, name: '', x0: 0, x1: 0.06, z0: Math.max(P + 0.1, d2.to + 0.05, d3.from - 0.45), z1: d3.from - 0.05, kind: 'hooks' }
     ];
+
+    // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
+    moi = moi.filter(function (it) { return it.id !== 'hooks' || it.z1 - it.z0 >= 0.2; });
 
     // --- Hiện trạng ---
     var cu = [
@@ -138,8 +149,10 @@
 
     return {
       W: W, L: L, P: P, moi: moi, cu: cu, tvC: tvC, bed: bed, sinkC: sinkC, sofa: sofa, wardrobe: wardrobe,
-      openings: [w1].concat(common),
-      openingsCu: [d1].concat(common)
+      // Điều hoà mới 12.000 BTU trên tường cửa sổ nhỏ, thổi dọc 8 m; máy cũ ở tường sân chỉ còn ở hiện trạng.
+      ac: { wall: 'B', from: W / 2 - 0.42, to: W / 2 + 0.42 },
+      openings: [w1, d2, d3].concat(common),
+      openingsCu: [d1, d2, d3cu].concat(common)
     };
   }
 
@@ -194,7 +207,7 @@
           g.appendChild(el('line', { x1: a, y1: yw, x2: b, y2: yw, class: 'pl-glass' }));
         } else {
           var dir = o.wall === 'A' ? -1 : 1;
-          var leaves = o.kind === 'door2' ? [[a, (a + b) / 2, 1], [b, (a + b) / 2, -1]] : [[a, b, 1]];
+          var leaves = o.kind === 'door2' ? [[a, (a + b) / 2, 1], [b, (a + b) / 2, -1]] : o.hinge === 'to' ? [[b, a, -1]] : [[a, b, 1]];
           leaves.forEach(function (lf) {
             var hx = lf[0], len = Math.abs(lf[1] - lf[0]), s = lf[2];
             g.appendChild(el('line', { x1: hx, y1: yw, x2: hx, y2: yw + dir * len, class: 'pl-leaf' }));
@@ -214,13 +227,19 @@
     // Vách cũ (ở mặt bằng mới: nét đứt)
     if (mode === 'moi') {
       svg.appendChild(el('line', { x1: X(P), y1: Y(W), x2: X(P), y2: Y(0), class: 'pl-oldwall' }));
-      svg.appendChild(el('text', { x: X(P), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center pl-rose' }, 'vách cũ · rèm voan'));
+      svg.appendChild(el('text', { x: X(P), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center pl-rose' }, 'vách cũ · rèm voan + rèm dày'));
     }
 
-    // Điều hoà (treo cao trên tường phía sân, vẽ nét đứt để không che đồ bên dưới)
-    var acZ = lay.tvC;
-    svg.appendChild(el('rect', { x: X(acZ - 0.4), y: Y(0) - 24, width: 80, height: 18, rx: 3, class: 'pl-ac' }));
-    svg.appendChild(el('text', { x: X(acZ), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center' }, mode === 'moi' ? 'điều hoà phía trên TV' : 'điều hoà (trên cao)'));
+    // Điều hoà (treo cao, vẽ nét đứt để không che đồ bên dưới). Hiện trạng: tường sân trên mảng 160 cm.
+    // Phương án mới: máy 12.000 BTU trên tường cửa sổ nhỏ, thổi dọc phòng.
+    if (mode === 'cu') {
+      svg.appendChild(el('rect', { x: X(lay.tvC - 0.4), y: Y(0) - 24, width: 80, height: 18, rx: 3, class: 'pl-ac' }));
+      svg.appendChild(el('text', { x: X(lay.tvC), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center' }, 'điều hoà 9.000 BTU (trên cao)'));
+    } else {
+      svg.appendChild(el('rect', { x: X(0) + 6, y: Y(lay.ac.to), width: 20, height: (lay.ac.to - lay.ac.from) * S, rx: 3, class: 'pl-ac' }));
+      var acx = X(0) + 40, acy = Y((lay.ac.from + lay.ac.to) / 2);
+      svg.appendChild(el('text', { x: acx, y: acy, class: 'pl-small pl-center', transform: 'rotate(-90 ' + acx + ' ' + acy + ')' }, 'điều hoà 12.000 BTU'));
+    }
 
     // Đồ đạc
     var items = mode === 'moi' ? lay.moi : lay.cu;
@@ -249,6 +268,7 @@
         if (it.kind === 'partition') { cx = x + w / 2; cy = Y(W) + 60; }
         if (it.kind === 'feat') { cx = x + w / 2; cy = y + 22; }
         if (it.kind === 'tv') { cy = y + h - 18; }
+        if (it.kind === 'mirror' || it.kind === 'hooks') { cy = y - 20; }
         g.appendChild(el('circle', { cx: cx, cy: cy, r: 15, class: 'pl-badge' }));
         g.appendChild(el('text', { x: cx, y: cy + 5.5, class: 'pl-badge-t' }, String(it.n)));
       }
@@ -772,7 +792,8 @@
       } else {
         pane(leafMat, o.from + 0.01, o.to - 0.01, 0, o.top, 0.045);
         pane(mats.glass, o.from + 0.12, o.to - 0.12, 1.0, 1.75, 0.05);
-        pane(mats.metal, o.from + w - 0.12, o.from + w - 0.08, 0.95, 1.12, 0.08);
+        var hu = o.hinge === 'to' ? o.from + 0.08 : o.to - 0.12; // tay nắm ở mép đối diện bản lề
+        pane(mats.metal, hu, hu + 0.04, 0.95, 1.12, 0.08);
       }
       if (o.head) {
         pane(mats.frame, o.from, o.to, o.top, o.top + 0.05, 0.1);
@@ -855,8 +876,8 @@
       box(R, mats.black, 0.02, 0.05, 1.0, 1.64, tz - 0.56, tz + 0.56);
       box(R, mats.screen, 0.05, 0.052, 1.02, 1.62, tz - 0.54, tz + 0.54, { shadow: false });
       box(R, mats.black, 0.02, 0.09, 0.9, 0.96, tz - 0.45, tz + 0.45); // loa thanh treo dưới TV
-      // Điều hoà
-      box(R, mats.white, 0, 0.22, 2.3, 2.6, tz - 0.42, tz + 0.42);
+      // Điều hoà mới trên tường cửa sổ nhỏ (tường B), cách trần 10 cm
+      box(R, mats.white, lay.ac.from, lay.ac.to, H - 0.4, H - 0.1, 0, 0.22);
 
       // --- Thảm ---
       ['rug', 'rug2'].forEach(function (id) {
@@ -867,89 +888,105 @@
 
       // --- Tủ quần áo cửa lùa ---
       var w = get('wr');
-      box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0.06, 2.62, w.z0, w.z1);
-      box(R, mats.wall, w.x0 + 0.02, w.x1, 2.62, H, w.z0, w.z1, { shadow: false });
+      box(R, mats.wardrobe, w.x0 + 0.02, w.x1, 0.06, H - 0.02, w.z0, w.z1);
       var nPanel = w.z1 - w.z0 > 1.8 ? 3 : 2, pw = (w.z1 - w.z0) / nPanel;
       for (var k = 0; k < nPanel; k++) {
         var z0 = w.z0 + k * pw, front = k % 2 ? w.x0 + 0.02 : w.x0;
-        box(R, k === 1 ? mats.wood : mats.wardrobe, front - 0.02, front, 0.08, 2.6, z0 + 0.005, z0 + pw - 0.005);
+        box(R, k === 1 ? mats.wood : mats.wardrobe, front - 0.02, front, 0.08, 2.38, z0 + 0.005, z0 + pw - 0.005);
         box(R, mats.metal, front - 0.03, front - 0.02, 0.9, 1.5, z0 + pw - 0.07, z0 + pw - 0.055, { shadow: false });
+        // hộc nóc cánh lật 2,4–3,0 m
+        box(R, mats.wardrobe, w.x0 - 0.02, w.x0, 2.42, H - 0.04, z0 + 0.005, z0 + pw - 0.005);
       }
-      box(R, mats.led, w.x0 + 0.03, w.x0 + 0.05, 2.6, 2.61, w.z0, w.z1, { shadow: false });
+      var toe = box(R, mats.led, w.x0 + 0.03, w.x0 + 0.05, 0.05, 0.06, w.z0, w.z1, { shadow: false }); // LED hắt chân tủ
+      toe.userData.led = true;
 
       // --- Gương toàn thân ---
       var mi = get('mirror');
-      if (mi.z1 - mi.z0 > 0.3) {
-        box(R, mats.metal, W - 0.05, W - 0.02, 0.12, 1.82, mi.z0, mi.z1);
-        box(R, mats.mirror, W - 0.055, W - 0.05, 0.15, 1.79, mi.z0 + 0.03, mi.z1 - 0.03, { shadow: false });
-      }
+      // lưng gương màu sáng (khi tường sân mờ đi, nhìn từ ngoài không thành một tấm sẫm)
+      box(R, mats.frame, 0, 0.025, 0.3, 2.0, mi.z0, mi.z1, { shadow: false });
+      box(R, mats.mirror, 0.025, 0.03, 0.32, 1.98, mi.z0 + 0.02, mi.z1 - 0.02, { shadow: false });
+      [[0.3, 0.32], [1.98, 2.0]].forEach(function (yy) { box(R, mats.metal, 0.02, 0.035, yy[0], yy[1], mi.z0, mi.z1, { shadow: false }); });
+      [mi.z0, mi.z1 - 0.02].forEach(function (zz) { box(R, mats.metal, 0.02, 0.035, 0.3, 2.0, zz, zz + 0.02, { shadow: false }); });
 
       // --- Bàn trang điểm + ghế + gương tròn ---
       var d = get('desk'), dcx = (d.x0 + d.x1) / 2;
       box(R, mats.wood, d.x0, d.x1, 0.72, 0.76, d.z0, d.z1 - 0.01);
       box(R, mats.wardrobe, d.x0 + 0.02, d.x1 - 0.02, 0.58, 0.72, d.z0 + 0.02, d.z1 - 0.01);
-      cyl(R, mats.metal, 0.012, 0.3, dcx - 0.25, 0.76, L - 0.2, 8);
-      var rm = new T3.Mesh(new T3.CylinderGeometry(0.17, 0.17, 0.015, 40), mats.mirror);
+      // gương LED để bàn (thấp hơn bậu cửa sổ để không che sáng)
+      cyl(R, mats.metal, 0.06, 0.02, dcx - 0.3, 0.76, L - 0.25, 16);
+      cyl(R, mats.metal, 0.01, 0.12, dcx - 0.3, 0.78, L - 0.25, 8);
+      var rm = new T3.Mesh(new T3.CylinderGeometry(0.13, 0.13, 0.015, 40), mats.mirror);
       rm.rotation.x = Math.PI / 2;
-      rm.position.set(dcx - 0.25, 1.22, L - 0.2);
+      rm.position.set(dcx - 0.3, 0.98, L - 0.25);
       R.add(rm);
       box(R, mats.accent, dcx + 0.15, dcx + 0.35, 0.76, 0.8, L - 0.35, L - 0.2);
       var st = get('stool');
-      cyl(R, mats.sofa, 0.2, 0.46, (st.x0 + st.x1) / 2, 0, (st.z0 + st.z1) / 2);
-      // rèm voan hai bên cửa sổ
+      cyl(R, mats.sofa, 0.21, 0.45, (st.x0 + st.x1) / 2, 0, (st.z0 + st.z1) / 2);
+      // rèm cuốn trên cửa sổ (cửa sổ phải là loại lùa hoặc mở ra ngoài vì bàn kê sát)
       var wk = lay.openings.filter(function (o) { return o.kind === 'window' && o.wall === 'K' && o.bottom < 2; })[0];
-      [[wk.from - 0.35, wk.from - 0.05], [wk.to + 0.05, wk.to + 0.35]].forEach(function (c) {
-        drape(R, 'x', L - 0.08, Math.max(0.02, c[0]), Math.min(W - 0.02, c[1]), 0.9, 2.55);
-      });
-      box(R, mats.metal, wk.from - 0.4, wk.to + 0.4, 2.56, 2.58, L - 0.09, L - 0.07, { shadow: false });
+      box(R, mats.sheer, wk.from - 0.05, wk.to + 0.05, wk.top - 0.25, wk.top + 0.08, L - 0.1, L - 0.02, { shadow: false });
 
-      // --- Sofa + bàn trà ---
-      var s = get('sofa');
-      box(R, mats.sofa, s.x0 + 0.02, s.x1, 0.12, 0.42, s.z0 + 0.1, s.z1 - 0.1);
-      box(R, mats.sofa, s.x0 + 0.02, s.x0 + 0.2, 0.12, 0.82, s.z0 + 0.1, s.z1 - 0.1);
-      box(R, mats.sofa, s.x0 + 0.02, s.x1, 0.12, 0.6, s.z0, s.z0 + 0.12);
-      box(R, mats.sofa, s.x0 + 0.02, s.x1, 0.12, 0.6, s.z1 - 0.12, s.z1);
-      box(R, mats.bed, s.x0 + 0.2, s.x1 - 0.02, 0.42, 0.5, s.z0 + 0.12, (s.z0 + s.z1) / 2 - 0.01);
-      box(R, mats.bed, s.x0 + 0.2, s.x1 - 0.02, 0.42, 0.5, (s.z0 + s.z1) / 2 + 0.01, s.z1 - 0.12);
-      var cuS = box(R, mats.accent, s.x0 + 0.2, s.x0 + 0.32, 0.5, 0.8, s.z0 + 0.2, s.z0 + 0.55);
-      cuS.rotation.z = -0.2;
+      // --- Ghế văng có hộc (lưng tựa tường bếp cũ) + bàn trà + đèn đọc sách ---
+      var s = get('sofa'), smz = (s.z0 + s.z1) / 2;
+      box(R, mats.sofa, s.x0, s.x1, 0.06, 0.44, s.z0 + 0.05, s.z1 - 0.02);
+      box(R, mats.backing, s.x0 + 0.02, s.x1 - 0.02, 0.06, 0.1, s.z0 + 0.04, s.z0 + 0.06, { shadow: false }); // khe hộc
+      box(R, mats.sofa, s.x0, s.x1, 0.06, 0.86, s.z1 - 0.18, s.z1 - 0.02);
+      box(R, mats.sofa, s.x0, s.x0 + 0.12, 0.06, 0.62, s.z0 + 0.05, s.z1 - 0.02);
+      box(R, mats.sofa, s.x1 - 0.12, s.x1, 0.06, 0.62, s.z0 + 0.05, s.z1 - 0.02);
+      var sMid = (s.x0 + s.x1) / 2;
+      box(R, mats.bed, s.x0 + 0.13, sMid - 0.01, 0.44, 0.52, s.z0 + 0.06, s.z1 - 0.18);
+      box(R, mats.bed, sMid + 0.01, s.x1 - 0.13, 0.44, 0.52, s.z0 + 0.06, s.z1 - 0.18);
+      var cuS = box(R, mats.accent, s.x0 + 0.18, s.x0 + 0.52, 0.52, 0.82, s.z1 - 0.32, s.z1 - 0.2);
+      cuS.rotation.x = 0.2;
       var tb = get('table'), tcx = (tb.x0 + tb.x1) / 2, tcz = (tb.z0 + tb.z1) / 2;
       cyl(R, mats.wood, (tb.x1 - tb.x0) / 2, 0.03, tcx, 0.42, tcz, 48);
       cyl(R, mats.metal, 0.025, 0.42, tcx, 0, tcz, 12);
       cyl(R, mats.metal, 0.16, 0.015, tcx, 0, tcz, 24);
-      cyl(R, mats.pot, 0.05, 0.16, tcx + 0.08, 0.45, tcz, 16);
-      // đèn cây cạnh sofa
-      var lz = Math.min(s.z1 + 0.18, L - 0.2);
-      cyl(R, mats.metal, 0.12, 0.02, 0.25, 0, lz, 24);
-      cyl(R, mats.metal, 0.012, 1.45, 0.25, 0.02, lz, 8);
-      var shade = add(R, new T3.CylinderGeometry(0.13, 0.17, 0.25, 32, 1, true), mats.bulb, 0.25, 1.5, lz);
+      cyl(R, mats.pot, 0.05, 0.16, tcx + 0.06, 0.45, tcz, 16);
+      // đèn tường đọc sách trên tay ghế (tường C)
+      var lz = s.z1 - 0.4;
+      box(R, mats.metal, W - 0.03, W, 1.35, 1.45, lz - 0.04, lz + 0.04);
+      box(R, mats.metal, W - 0.22, W - 0.03, 1.42, 1.44, lz - 0.01, lz + 0.01);
+      var shade = add(R, new T3.CylinderGeometry(0.07, 0.1, 0.14, 24, 1, true), mats.bulb, W - 0.24, 1.33, lz);
       shade.material = mats.bulb;
-      var fl = new T3.PointLight(0xffb873, 0, 3.5, 2);
-      fl.position.set(0.3, 1.45, lz + 0.05);
+      var fl = new T3.PointLight(0xffb873, 0, 3, 2);
+      fl.position.set(W - 0.3, 1.25, lz);
       scene.add(fl);
       nightLights.push(fl);
 
       // --- Tủ giày + móc khăn cạnh cửa 3 ---
       var sh = get('shoe');
-      if (sh.z1 - sh.z0 > 0.3) {
-        box(R, mats.wardrobe, sh.x0, sh.x1, 0.1, 0.95, sh.z0, sh.z1);
-        box(R, mats.wood, sh.x0, sh.x1 + 0.01, 0.95, 0.98, sh.z0, sh.z1);
-        box(R, mats.wood, 0, 0.03, 1.55, 1.62, sh.z0 + 0.05, sh.z1 - 0.05);
-        [0.2, 0.45].forEach(function (f) {
-          box(R, mats.metal, 0.03, 0.09, 1.5, 1.55, sh.z0 + f * (sh.z1 - sh.z0) * 1.4, sh.z0 + f * (sh.z1 - sh.z0) * 1.4 + 0.02, { shadow: false });
-        });
+      box(R, mats.wardrobe, sh.x0, sh.x1, 0.1, 0.88, sh.z0, sh.z1);
+      box(R, mats.wood, sh.x0, sh.x1 + 0.01, 0.88, 0.91, sh.z0, sh.z1);
+      for (var sl = 0; sl < 4; sl++) { // khe thoáng trên cánh lật
+        box(R, mats.backing, sh.x1, sh.x1 + 0.003, 0.6 + sl * 0.05, 0.62 + sl * 0.05, sh.z0 + 0.1, sh.z1 - 0.1, { shadow: false });
+      }
+      var hk = get('hooks');
+      if (hk) box(R, mats.wood, 0, 0.03, 1.62, 1.7, hk.z0, hk.z1);
+      for (var hi = 0; hk && hi < 4; hi++) {
+        var hz = hk.z0 + 0.06 + hi * (hk.z1 - hk.z0 - 0.12) / 3;
+        box(R, mats.metal, 0.03, 0.09, 1.6, 1.63, hz - 0.01, hz + 0.01, { shadow: false });
       }
 
       // --- Cây xanh ---
-      var pt = get('plant'), pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2;
-      cyl(R, mats.pot, 0.17, 0.42, pcx, 0, pcz);
-      [[0, 0.95, 0, 0.26], [0.08, 1.2, 0.05, 0.2], [-0.07, 1.15, -0.06, 0.19], [0.02, 1.38, -0.02, 0.15]].forEach(function (l) {
-        add(R, new T3.SphereGeometry(l[3], 16, 12), mats.leaf, pcx + l[0], l[1], pcz + l[2]);
+      ['plant', 'plant2'].forEach(function (id, n) {
+        var pt = get(id), pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2, k = n ? 0.8 : 1;
+        cyl(R, mats.pot, 0.15 * k + 0.02, 0.42, pcx, 0, pcz);
+        [[0, 0.95, 0, 0.26], [0.08, 1.2, 0.05, 0.2], [-0.07, 1.15, -0.06, 0.19], [0.02, 1.38, -0.02, 0.15]].forEach(function (l) {
+          add(R, new T3.SphereGeometry(l[3] * k, 16, 12), mats.leaf, pcx + l[0] * k, 0.42 + (l[1] - 0.42) * k, pcz + l[2] * k);
+        });
+        cyl(R, mats.doorWood, 0.02, 0.6 * k, pcx, 0.42, pcz, 6);
       });
-      cyl(R, mats.doorWood, 0.02, 0.6, pcx, 0.42, pcz, 6);
 
       // --- Rèm voan chia khu: ray âm trần (không vẽ vì không có trần), rèm dồn gọn sát tường phía sân ---
+      var d3o = lay.openings.filter(function (o) { return o.hinge === 'to'; })[0];
+      if (!(P > d3o.from - 0.1 && P < d3o.to + 0.1)) {
       drape(R, 'x', P, 0.04, 0.4, 0.06, H - 0.04);
+      // lớp rèm vải dày cạnh lớp voan: ban đêm kéo ra để điều hoà chỉ làm mát khu ngủ
+      var heavy = new T3.Mesh(new T3.BoxGeometry(0.28, H - 0.1, 0.1), mats.head);
+      heavy.position.set(0.56, (H - 0.04 + 0.06) / 2, P);
+      R.add(heavy);
+      }
 
       // --- Đèn LED hắt trần (ban đêm) ---
       [[W / 2, L * 0.25], [W / 2, L * 0.75]].forEach(function (p) {
