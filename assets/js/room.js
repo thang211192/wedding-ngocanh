@@ -86,8 +86,8 @@
     //   cửa 2 hai cánh · cửa 3 cách tường bếp cũ 220 cm, là lối ra nhà tắm.
     var d1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 1' };
     var d2 = { wall: 'A', from: 2.95, to: 3.75, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', label: 'Cửa 2' };
-    // Cửa 3 nên đặt bản lề ở mép phía tường bếp cũ: cánh mở ra xa người đi từ giường tới.
-    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door', hinge: 'to', label: 'Cửa 3 · ra nhà tắm' };
+    // Cửa 3 là cửa đôi mở ra ngoài, nên trong phòng không có vùng quét cánh.
+    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', outward: true, label: 'Cửa 3 · ra nhà tắm' };
     // Phương án mới: xây bậu nửa dưới cửa 1, thành cửa sổ (giữ ánh sáng, bớt một lối ra ngoài).
     var w1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0.9, top: 2.3, kind: 'window', label: 'Cửa 1 → cửa sổ' };
     var winB = { wall: 'B', from: W / 2 - 0.4, to: W / 2 + 0.4, bottom: 1.9, top: 2.5, kind: 'window' };
@@ -96,8 +96,7 @@
     var sinkC = (winK.from + winK.to) / 2;
     var ventK = { wall: 'K', from: 1.6, to: 2.1, bottom: 2.35, top: 2.75, kind: 'window' };
     var common = [winB, winK, ventK];
-    // Hiện trạng chưa biết bản lề cửa 3 ở mép nào nên vẽ mặc định; bản lề phía tường bếp chỉ là đề xuất.
-    var d3cu = { wall: 'A', from: d3.from, to: d3.to, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: d3.label };
+
 
     // --- Phương án mới ---
     // Giường nằm gọn trên mảng tường giữa cửa 1 và cửa 2, chân giường nhìn vào TV.
@@ -117,7 +116,7 @@
       { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2)', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
       { id: 'ns2', n: 2, name: '', x0: W - 0.45, x1: W, z0: bed.z1 + 0.05, z1: bed.z1 + 0.5, kind: 'wood' },
       { id: 'feat', n: 3, name: 'Vách lam gỗ + LED hắt sau đầu giường', x0: W - 0.06, x1: W, z0: featZ0, z1: featZ1, kind: 'feat' },
-      { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm giữa cửa 1 và cửa 2', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
+      { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm, dưới điều hoà', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
       { id: 'rug', n: 5, name: 'Thảm trải dưới giường', x0: Math.max(0.15, bed.x0 - 0.5), x1: W - 0.75, z0: bed.z0 - 0.35, z1: bed.z1 + 0.35, kind: 'rug' },
       { id: 'wr', n: 6, name: 'Tủ quần áo cửa lùa ' + vn(wrLen) + ' m, hộc nóc kịch trần 3 m', x0: wardrobe.x0, x1: wardrobe.x1, z0: wardrobe.z0, z1: wardrobe.z1, kind: 'wardrobe' },
       { id: 'mirror', n: 7, name: 'Gương toàn thân treo tường, cạnh bàn trang điểm', x0: 0, x1: 0.05, z0: L - 1.1, z1: L - 0.55, kind: 'mirror' },
@@ -149,10 +148,9 @@
 
     return {
       W: W, L: L, P: P, moi: moi, cu: cu, tvC: tvC, bed: bed, sinkC: sinkC, sofa: sofa, wardrobe: wardrobe,
-      // Điều hoà mới 12.000 BTU trên tường cửa sổ nhỏ, thổi dọc 8 m; máy cũ ở tường sân chỉ còn ở hiện trạng.
-      ac: { wall: 'B', from: W / 2 - 0.42, to: W / 2 + 0.42 },
+      d3: d3,
       openings: [w1, d2, d3].concat(common),
-      openingsCu: [d1, d2, d3cu].concat(common)
+      openingsCu: [d1, d2, d3].concat(common)
     };
   }
 
@@ -196,7 +194,7 @@
 
     // Cửa & cửa sổ
     (mode === 'moi' ? lay.openings : lay.openingsCu).forEach(function (o) {
-      if (o.label) svg.appendChild(el('text', { x: X((o.from + o.to) / 2), y: Y(0) + T * S / 2 + 18, class: 'pl-door pl-center' }, o.label));
+      if (o.label) svg.appendChild(el('text', { x: X((o.from + o.to) / 2), y: Y(0) + T * S / 2 + (o.outward ? 58 : 18), class: 'pl-door pl-center' }, o.label)); // cửa mở ra ngoài: chữ nằm dưới cung mở
       var g = el('g', { class: 'pl-open pl-open--' + o.kind });
       var a, b, isZ = o.wall === 'A' || o.wall === 'C';
       if (isZ) {
@@ -206,8 +204,8 @@
         if (o.kind === 'window') {
           g.appendChild(el('line', { x1: a, y1: yw, x2: b, y2: yw, class: 'pl-glass' }));
         } else {
-          var dir = o.wall === 'A' ? -1 : 1;
-          var leaves = o.kind === 'door2' ? [[a, (a + b) / 2, 1], [b, (a + b) / 2, -1]] : o.hinge === 'to' ? [[b, a, -1]] : [[a, b, 1]];
+          var dir = (o.wall === 'A' ? -1 : 1) * (o.outward ? -1 : 1); // cửa mở ra ngoài vẽ cung phía ngoài tường
+          var leaves = o.kind === 'door2' ? [[a, (a + b) / 2, 1], [b, (a + b) / 2, -1]] : [[a, b, 1]];
           leaves.forEach(function (lf) {
             var hx = lf[0], len = Math.abs(lf[1] - lf[0]), s = lf[2];
             g.appendChild(el('line', { x1: hx, y1: yw, x2: hx, y2: yw + dir * len, class: 'pl-leaf' }));
@@ -227,19 +225,14 @@
     // Vách cũ (ở mặt bằng mới: nét đứt)
     if (mode === 'moi') {
       svg.appendChild(el('line', { x1: X(P), y1: Y(W), x2: X(P), y2: Y(0), class: 'pl-oldwall' }));
-      svg.appendChild(el('text', { x: X(P), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center pl-rose' }, 'vách cũ · rèm voan + rèm dày'));
+      // Nhãn viết dọc theo nét đứt, nằm trong phòng, để không đụng nhãn cửa và điều hoà dưới tường
+      var vx = X(P) + 16, vy = Y(W * 0.42);
+      svg.appendChild(el('text', { x: vx, y: vy, class: 'pl-small pl-center pl-rose', transform: 'rotate(-90 ' + vx + ' ' + vy + ')' }, 'vách cũ · 2 lớp rèm'));
     }
 
-    // Điều hoà (treo cao, vẽ nét đứt để không che đồ bên dưới). Hiện trạng: tường sân trên mảng 160 cm.
-    // Phương án mới: máy 12.000 BTU trên tường cửa sổ nhỏ, thổi dọc phòng.
-    if (mode === 'cu') {
-      svg.appendChild(el('rect', { x: X(lay.tvC - 0.4), y: Y(0) - 24, width: 80, height: 18, rx: 3, class: 'pl-ac' }));
-      svg.appendChild(el('text', { x: X(lay.tvC), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center' }, 'điều hoà 9.000 BTU (trên cao)'));
-    } else {
-      svg.appendChild(el('rect', { x: X(0) + 6, y: Y(lay.ac.to), width: 20, height: (lay.ac.to - lay.ac.from) * S, rx: 3, class: 'pl-ac' }));
-      var acx = X(0) + 40, acy = Y((lay.ac.from + lay.ac.to) / 2);
-      svg.appendChild(el('text', { x: acx, y: acy, class: 'pl-small pl-center', transform: 'rotate(-90 ' + acx + ' ' + acy + ')' }, 'điều hoà 12.000 BTU'));
-    }
+    // Điều hoà 9.000 BTU inverter giữ nguyên trên mảng tường 160 cm, phía trên TV (vẽ nét đứt).
+    svg.appendChild(el('rect', { x: X(lay.tvC - 0.4), y: Y(0) - 52, width: 80, height: 18, rx: 3, class: 'pl-ac' })); // lùi vào để không đè số của TV
+    svg.appendChild(el('text', { x: X(lay.tvC), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center' }, mode === 'moi' ? 'điều hoà (giữ nguyên)' : 'điều hoà (trên cao)'));
 
     // Đồ đạc
     var items = mode === 'moi' ? lay.moi : lay.cu;
@@ -291,7 +284,7 @@
     svg.appendChild(el('text', { x: dimX - 8, y: Y(W / 2), class: 'pl-dimt pl-center', transform: 'rotate(-90 ' + (dimX - 8) + ' ' + Y(W / 2) + ')' }, vn(W) + ' m'));
 
     // Tên tường
-    svg.appendChild(el('text', { x: X(L / 2), y: Y(0) + T * S / 2 + 64, class: 'pl-wallname pl-center' }, 'PHÍA SÂN'));
+    svg.appendChild(el('text', { x: X(P / 2), y: Y(0) + T * S / 2 + 64, class: 'pl-wallname pl-center' }, 'PHÍA SÂN')); // tránh nhãn cửa 3 ở phòng ngắn
     svg.appendChild(el('text', { x: X(L) + T * S / 2 + 30, y: Y(W / 2), class: 'pl-wallname pl-center', transform: 'rotate(90 ' + (X(L) + T * S / 2 + 30) + ' ' + Y(W / 2) + ')' }, 'TƯỜNG BẾP CŨ'));
 
     // Diện tích
@@ -779,22 +772,15 @@
         pane(mats.glass, o.from, o.to, o.bottom, o.top, 0.01);
         return;
       }
-      var leafMat = o.kind === 'door2' ? mats.doorWood : mats.wardrobe;
-      if (o.kind === 'door2') {
-        var mid = (o.from + o.to) / 2;
-        [[o.from, mid], [mid, o.to]].forEach(function (lf) {
-          pane(leafMat, lf[0] + 0.01, lf[1] - 0.01, 0, o.top, 0.045);
-          for (var r = 0; r < 3; r++) {
-            var y0 = 0.85 + r * 0.33;
-            pane(mats.glass, lf[0] + 0.07, lf[1] - 0.07, y0, y0 + 0.26, 0.05, -0.06);
-          }
-        });
-      } else {
-        pane(leafMat, o.from + 0.01, o.to - 0.01, 0, o.top, 0.045);
-        pane(mats.glass, o.from + 0.12, o.to - 0.12, 1.0, 1.75, 0.05);
-        var hu = o.hinge === 'to' ? o.from + 0.08 : o.to - 0.12; // tay nắm ở mép đối diện bản lề
-        pane(mats.metal, hu, hu + 0.04, 0.95, 1.12, 0.08);
-      }
+      // Ở phương án mới, cửa nào còn lại cũng là cửa đôi gỗ kính (cửa 2, cửa 3).
+      var mid = (o.from + o.to) / 2;
+      [[o.from, mid], [mid, o.to]].forEach(function (lf) {
+        pane(mats.doorWood, lf[0] + 0.01, lf[1] - 0.01, 0, o.top, 0.045);
+        for (var r = 0; r < 3; r++) {
+          var y0 = 0.85 + r * 0.33;
+          pane(mats.glass, lf[0] + 0.07, lf[1] - 0.07, y0, y0 + 0.26, 0.05, -0.06);
+        }
+      });
       if (o.head) {
         pane(mats.frame, o.from, o.to, o.top, o.top + 0.05, 0.1);
         pane(mats.glass, o.from, o.to, o.top + 0.05, o.head, 0.02);
@@ -876,8 +862,8 @@
       box(R, mats.black, 0.02, 0.05, 1.0, 1.64, tz - 0.56, tz + 0.56);
       box(R, mats.screen, 0.05, 0.052, 1.02, 1.62, tz - 0.54, tz + 0.54, { shadow: false });
       box(R, mats.black, 0.02, 0.09, 0.9, 0.96, tz - 0.45, tz + 0.45); // loa thanh treo dưới TV
-      // Điều hoà mới trên tường cửa sổ nhỏ (tường B), cách trần 10 cm
-      box(R, mats.white, lay.ac.from, lay.ac.to, H - 0.4, H - 0.1, 0, 0.22);
+      // Điều hoà 9.000 BTU inverter giữ nguyên chỗ cũ, phía trên TV
+      box(R, mats.white, 0, 0.22, 2.35, 2.65, tz - 0.42, tz + 0.42);
 
       // --- Thảm ---
       ['rug', 'rug2'].forEach(function (id) {
@@ -922,7 +908,7 @@
       box(R, mats.accent, dcx + 0.15, dcx + 0.35, 0.76, 0.8, L - 0.35, L - 0.2);
       var st = get('stool');
       cyl(R, mats.sofa, 0.21, 0.45, (st.x0 + st.x1) / 2, 0, (st.z0 + st.z1) / 2);
-      // rèm cuốn trên cửa sổ (cửa sổ phải là loại lùa hoặc mở ra ngoài vì bàn kê sát)
+      // rèm cuốn trên cửa sổ (cửa sổ hai cánh mở ra ngoài nên không vướng bàn)
       var wk = lay.openings.filter(function (o) { return o.kind === 'window' && o.wall === 'K' && o.bottom < 2; })[0];
       box(R, mats.sheer, wk.from - 0.05, wk.to + 0.05, wk.top - 0.25, wk.top + 0.08, L - 0.1, L - 0.02, { shadow: false });
 
@@ -979,7 +965,7 @@
       });
 
       // --- Rèm voan chia khu: ray âm trần (không vẽ vì không có trần), rèm dồn gọn sát tường phía sân ---
-      var d3o = lay.openings.filter(function (o) { return o.hinge === 'to'; })[0];
+      var d3o = lay.d3;
       if (!(P > d3o.from - 0.1 && P < d3o.to + 0.1)) {
       drape(R, 'x', P, 0.04, 0.4, 0.06, H - 0.04);
       // lớp rèm vải dày cạnh lớp voan: ban đêm kéo ra để điều hoà chỉ làm mát khu ngủ

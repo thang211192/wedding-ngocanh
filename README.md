@@ -90,7 +90,7 @@ Trang phụ `phong-cuoi.html` — bản thiết kế phòng cưới (bỏ vách 
 | **Phối cảnh 3D** | three.js r128 từ cdnjs. Xoay, phóng to, 5 góc nhìn đặt sẵn, chế độ buổi tối và trang trí ngày cưới. Tường quay về phía mắt nhìn tự mờ đi |
 | **Màu &amp; vật liệu** | 3 bảng màu (đổi luôn trên 3D) và bảng vật liệu cho từng bề mặt |
 | **Thi công · chi phí** | Thứ tự 4 tuần, bảng dự trù tick chọn được, lưu ý kỹ thuật khi bỏ bếp, yêu cầu cho bếp ngoài trời |
-| **Thông tin** | Số đo đã nhận (phòng 7,2 × 20 viên gạch 40 cm = 2,88 × 8 m, vách ở viên thứ 10, vị trí 3 cửa, trần 4 m, cửa sổ bồn rửa 80 × 100, điều hoà 9.000 BTU) và 3 chỗ nên xem trước khi đặt thợ |
+| **Thông tin** | Số đo đã nhận (phòng 7,2 × 20 viên gạch 40 cm = 2,88 × 8 m, vách ở viên thứ 10, vị trí 3 cửa, trần 4 m, cửa sổ bồn rửa 80 × 100, điều hoà 9.000 BTU inverter giữ nguyên, cửa 3 và cửa sổ bồn rửa đều mở ra ngoài) — đã đủ để xin báo giá |
 
 Mặt bằng và 3D cùng vẽ từ một hàm `layout()` trong `assets/js/room.js`. Số đo và bảng màu
 lưu dưới khoá `wnc:room`. Không có mạng thì phần 3D báo lỗi nhẹ nhàng, mặt bằng vẫn chạy.
