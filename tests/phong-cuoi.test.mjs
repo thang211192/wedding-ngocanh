@@ -42,18 +42,18 @@ describe("mặt bằng", () => {
     const { page, errors, close } = await open();
     try {
       assert.match(await planLabel(page), /sau cải tạo/);
-      assert.equal(await legendCount(page), 10);
+      assert.equal(await legendCount(page), 11);
       await page.click('[data-plan-tab="cu"]');
       assert.match(await planLabel(page), /hiện trạng/);
       assert.equal(await legendCount(page), 8);
       assert.equal(await page.getAttribute('[data-plan-tab="cu"]', "aria-pressed"), "true");
       await page.click('[data-plan-tab="moi"]');
-      assert.equal(await legendCount(page), 10);
+      assert.equal(await legendCount(page), 11);
       assert.deepEqual(errors, []);
     } finally { await close(); }
   });
 
-  test("nhập số đo thì vẽ lại, tải lại vẫn còn, bấm về số ước lượng thì trả lại", async () => {
+  test("nhập số đo thì vẽ lại, tải lại vẫn còn, bấm về số đo theo gạch thì trả lại", async () => {
     const { page, close } = await open();
     try {
       await page.fill('#dimsForm [name="W"]', "4");
@@ -65,7 +65,17 @@ describe("mặt bằng", () => {
       assert.equal(await page.inputValue('#dimsForm [name="W"]'), "4");
       assert.match(await planLabel(page), /4 × 7,2 mét/);
       await page.click("#dimsReset");
-      assert.match(await planLabel(page), /3,4 × 6,6 mét/);
+      assert.match(await planLabel(page), /2,88 × 8 mét/);
+    } finally { await close(); }
+  });
+
+  test("cửa 1 thành cửa sổ ở phương án mới, vẫn là cửa ở hiện trạng", async () => {
+    const { page, close } = await open();
+    try {
+      const labels = () => page.locator("#plan .pl-door").allTextContents();
+      assert.deepEqual(await labels(), ["Cửa 1 → cửa sổ", "Cửa 2", "Cửa 3 · ra nhà tắm"]);
+      await page.click('[data-plan-tab="cu"]');
+      assert.deepEqual(await labels(), ["Cửa 1", "Cửa 2", "Cửa 3 · ra nhà tắm"]);
     } finally { await close(); }
   });
 
@@ -74,7 +84,7 @@ describe("mặt bằng", () => {
     try {
       await page.fill('#dimsForm [name="W"]', "40");
       await page.dispatchEvent("#dimsForm", "submit");
-      assert.match(await planLabel(page), /5 × 6,6 mét/);
+      assert.match(await planLabel(page), /5 × 8 mét/);
     } finally { await close(); }
   });
 });
@@ -98,10 +108,10 @@ describe("dự trù chi phí", () => {
   test("bỏ tick một hạng mục thì tổng trừ đúng khoảng của hạng mục đó", async () => {
     const { page, close } = await open();
     try {
-      assert.equal(await page.textContent("#costTotal"), "79–127 triệu");
+      assert.equal(await page.textContent("#costTotal"), "82–132 triệu");
       await page.locator('[data-cost][data-lo="16"] input').uncheck();
-      assert.equal(await page.textContent("#costTotal"), "63–103 triệu");
-      assert.equal(await page.textContent("#costCount"), "11/12 hạng mục");
+      assert.equal(await page.textContent("#costTotal"), "66–108 triệu");
+      assert.equal(await page.textContent("#costCount"), "12/13 hạng mục");
     } finally { await close(); }
   });
 });

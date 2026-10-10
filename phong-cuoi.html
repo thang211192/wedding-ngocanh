@@ -62,7 +62,7 @@ document.documentElement.className += ' js';
         <li><a class="nav__link" data-spy href="#mau">Màu</a></li>
         <li><a class="nav__link" data-spy href="#thi-cong">Thi công</a></li>
         <li><a class="nav__link" data-spy href="#chi-phi">Chi phí</a></li>
-        <li><a class="nav__link" data-spy href="#can-cung-cap">Cần anh gửi</a></li>
+        <li><a class="nav__link" data-spy href="#can-cung-cap">Thông tin</a></li>
         <li><a class="nav__link" href="index.html">Lộ trình cưới</a></li>
       </ul>
     </nav>
@@ -98,7 +98,7 @@ document.documentElement.className += ' js';
       <li><a href="#thi-cong"><svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg>Thi công 4 tuần</a></li>
       <li><a href="#chi-phi"><svg class="ico" aria-hidden="true"><use href="#i-wallet"/></svg>Dự trù chi phí</a></li>
       <li><a href="#bep-moi"><svg class="ico" aria-hidden="true"><use href="#i-utensils"/></svg>Bếp mới ở ngoài</a></li>
-      <li><a href="#can-cung-cap"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>Thông tin cần anh gửi</a></li>
+      <li><a href="#can-cung-cap"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>Thông tin đã nhận &amp; còn thiếu</a></li>
       <li><a href="index.html"><svg class="ico" aria-hidden="true"><use href="#i-heart"/></svg>Về trang lộ trình cưới</a></li>
     </ul>
   </div>
@@ -111,14 +111,14 @@ document.documentElement.className += ' js';
   <div class="wrap">
     <span class="hero__eyebrow">
       <svg class="ico ico-sm" aria-hidden="true"><use href="#i-home"/></svg>
-      Bản thiết kế tham khảo · lần 1
+      Bản thiết kế tham khảo · lần 2, theo số đo thật
     </span>
 
     <h1 class="hero__names hero__names--page">Phòng cưới<br><em>Bỏ vách, đưa bếp ra ngoài, gộp thành một phòng.</em></h1>
 
     <p class="hero__lead">
       Hiện giờ gian bếp cũ đang chia đôi bằng vách nhôm kính: một nửa là phòng ngủ, nửa kia là bàn ăn và bệ bếp.
-      Phương án này tháo vách và chuyển bếp ra ngoài, gộp lại thành <strong>một phòng ngủ khoảng <span id="roomArea">22 m²</span></strong>.
+      Phương án này tháo vách và chuyển bếp ra ngoài, gộp lại thành <strong>một phòng ngủ khoảng <span id="roomArea">23 m²</span></strong>.
       Phòng chia ba khu nhưng vẫn thông nhau: <strong>khu ngủ</strong> ở nửa phòng ngủ cũ, còn nửa bếp cũ thành
       <strong>chỗ thay đồ, trang điểm và ngồi nghỉ</strong>.
     </p>
@@ -134,7 +134,7 @@ document.documentElement.className += ' js';
       </a>
       <a class="btn btn--ghost" href="#can-cung-cap">
         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-info"/></svg>
-        Thông tin cần anh gửi
+        Thông tin còn thiếu
       </a>
       <button class="btn btn--ghost" id="printBtn" type="button">
         <svg class="ico ico-sm" aria-hidden="true"><use href="#i-printer"/></svg>
@@ -144,8 +144,9 @@ document.documentElement.className += ' js';
 
     <div class="note note--gold room-assume">
       <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
-      <span><strong>Số đo đang là ước lượng từ ảnh và video</strong> (rộng 3,4 m, dài 6,6 m, trần sau khi đóng thạch cao 3 m).
-        Anh đo thật rồi nhập vào ô <a href="#mat-bang">Số đo phòng</a>, mặt bằng và 3D sẽ tự vẽ lại theo đúng số đó.</span>
+      <span><strong>Đã vẽ theo số đo thật:</strong> sàn 7,2 × 20 viên gạch 40 cm, tức <strong>2,88 × 8 m</strong>,
+        vách cũ ở viên thứ 10 (cách tường cửa sổ nhỏ 4 m). Ba cửa 80 × 190 cm đúng vị trí anh gửi.
+        Riêng chiều cao trần chưa đo, đang giả định trần thạch cao mới ở 3 m.</span>
     </div>
   </div>
 </section>
@@ -157,9 +158,10 @@ document.documentElement.className += ' js';
       <span class="section__kicker">Mặt bằng</span>
       <h2 class="section__title">Trước và sau khi bỏ vách</h2>
       <p class="section__sub">
-        Đầu giường tựa vào bức tường đặc duy nhất của phòng, tức tường đối diện phía sân. TV treo phía sân,
-        ở khoảng tường giữa cửa ra vườn và cửa đôi, ngay dưới điều hoà. Nhờ vậy dây điện gom về một chỗ
-        và chân giường không chĩa thẳng vào cửa nào.
+        Phòng chỉ rộng 2,88 m nên giường 1m8 đặt ngang: đầu giường tựa bức tường đặc đối diện phía sân,
+        thân giường nằm gọn đúng mảng tường 160 cm giữa cửa 1 và cửa 2. TV treo sát mảng tường đó, dưới điều hoà.
+        Từ chân giường đến TV còn lối đi 80 cm, và cánh cửa nào mở ra cũng không vướng giường.
+        Cửa 1 đề xuất xây bậu thành cửa sổ. Như vậy phòng còn hai lối ra: cửa 2 là cửa chính, cửa 3 đi ra nhà tắm.
       </p>
     </div>
 
@@ -183,20 +185,20 @@ document.documentElement.className += ' js';
 
         <form class="dims" id="dimsForm" aria-labelledby="dimsTitle">
           <h3 id="dimsTitle" class="dims__title">Số đo phòng (mét)</h3>
-          <p class="dims__hint">Đo lòng trong, từ mặt tường đến mặt tường, sau khi bỏ vách.</p>
+          <p class="dims__hint">Đo lòng trong, từ mặt tường đến mặt tường. Một viên gạch lát là 40 cm.</p>
           <label>Chiều rộng<span>tường phía sân → tường đầu giường</span>
             <input name="W" type="number" inputmode="decimal" step="0.05" min="2.6" max="5" required>
           </label>
           <label>Chiều dài<span>tường cửa sổ nhỏ → tường bếp cũ</span>
-            <input name="L" type="number" inputmode="decimal" step="0.05" min="4.5" max="9" required>
+            <input name="L" type="number" inputmode="decimal" step="0.05" min="7" max="10" required>
           </label>
           <label>Vị trí vách cũ<span>tính từ tường cửa sổ nhỏ</span>
-            <input name="P" type="number" inputmode="decimal" step="0.05" min="2.2" max="6" required>
+            <input name="P" type="number" inputmode="decimal" step="0.05" min="3.8" max="6" required>
           </label>
           <div class="dims__actions">
             <button class="btn btn--primary btn--sm" type="submit">Vẽ lại</button>
             <button class="btn btn--ghost btn--sm" type="button" id="dimsReset">
-              <svg class="ico ico-sm" aria-hidden="true"><use href="#i-reset"/></svg>Về số ước lượng
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#i-reset"/></svg>Về số đo theo gạch
             </button>
           </div>
         </form>
@@ -207,22 +209,23 @@ document.documentElement.className += ' js';
       <article class="card reveal">
         <span class="pill pill--rose">Khu ngủ</span>
         <h3 class="card__title">Nửa phòng ngủ cũ</h3>
-        <p class="card__body">Giường 1m8 đặt giữa tường, hai bên có tab treo và đèn thả nên hai người lên xuống giường
-          không phải trèo qua nhau. Sau đầu giường là vách lam gỗ có LED hắt. Khu này đã có sẵn điều hoà và chỉ có
-          một ô cửa sổ nhỏ trên cao, nên tối và yên, hợp để ngủ.</p>
+        <p class="card__body">Giường 1m8 dài 2 m, kê ngang thì chiếm 2,08 m trong bề rộng 2,88 m của phòng.
+          Hai bên có tab treo và đèn thả nên hai người lên xuống giường không phải trèo qua nhau. Sau đầu giường
+          là vách lam gỗ có LED hắt. TV treo sát tường, không dùng kệ, để giữ lối đi 80 cm ở chân giường.</p>
       </article>
       <article class="card reveal">
         <span class="pill pill--gold">Thay đồ · trang điểm</span>
         <h3 class="card__title">Nửa bếp cũ, sát tường đầu giường</h3>
-        <p class="card__body">Tủ quần áo cửa lùa kịch trần không chiếm lối đi. Gương soi toàn thân đặt ở góc.
-          Bàn trang điểm kiêm bàn làm việc kê dưới cửa sổ chỗ bồn rửa cũ, ban ngày trang điểm có ánh sáng tự nhiên.</p>
+        <p class="card__body">Tủ quần áo cửa lùa dài 2,4 m, kịch trần, đặt đối diện cửa 3. Cửa lùa không cần chỗ mở cánh,
+          nên phòng hẹp vẫn còn lối đi rộng. Gương soi toàn thân đặt ở góc. Bàn trang điểm kiêm bàn làm việc kê
+          dưới cửa sổ chỗ bồn rửa cũ, ban ngày trang điểm có ánh sáng tự nhiên.</p>
       </article>
       <article class="card reveal">
         <span class="pill pill--ok">Ngồi nghỉ</span>
         <h3 class="card__title">Nửa bếp cũ, phía sân</h3>
-        <p class="card__body">Sofa hai chỗ, bàn trà tròn và đèn cây là chỗ uống trà, đọc sách, tiếp bạn thân mà không phải
-          ngồi lên giường. Ngay chỗ vách cũ có thể lắp ray rèm voan âm trần. Kéo rèm ra là có góc ngủ riêng,
-          dồn rèm vào là phòng lại rộng thoáng.</p>
+        <p class="card__body">Sofa hai chỗ, bàn trà tròn và đèn cây đặt giữa cửa 3 và tường bếp cũ. Đây là chỗ uống trà,
+          đọc sách, tiếp bạn thân mà không phải ngồi lên giường. Cạnh cửa 3 có tủ giày thấp và móc khăn cho lối ra nhà tắm.
+          Ngay chỗ vách cũ có thể lắp ray rèm voan âm trần: kéo rèm ra là có góc ngủ riêng, dồn rèm vào là phòng lại rộng thoáng.</p>
       </article>
     </div>
   </div>
@@ -321,18 +324,19 @@ document.documentElement.className += ' js';
         <p class="card__body">Tháo hẳn dây gas, không để đoạn ống thừa nằm lại trong phòng. Mạch ổ cắm bếp cũ nên tách
           ra thành mạch riêng có aptomat chống giật, dùng cho bàn trang điểm (máy sấy, máy uốn tóc) và ổ cắm đầu giường.</p></article>
       <article class="card reveal"><h3 class="card__title">Điều hoà có đủ sức?</h3>
-        <p class="card__body">Gộp hai phòng thì diện tích tăng gần gấp đôi. Phòng khoảng 22 m² cần máy 12.000 BTU.
+        <p class="card__body">Gộp hai phòng thì diện tích tăng gấp đôi. Phòng 23 m² cần máy 12.000 BTU.
           Nếu máy hiện tại là 9.000 BTU thì nên đổi máy, hoặc giữ máy cũ cho khu ngủ và kéo rèm chia khu vào những hôm nắng gắt.</p></article>
-      <article class="card reveal"><h3 class="card__title">Ba cửa ra ngoài trong một phòng ngủ</h3>
-        <p class="card__body">Cửa ra vườn, cửa đôi và cửa phía bếp cũ đều mở ra ngoài. Nên thay khoá cả ba và lắp lưới chống muỗi.
-          Cửa phía bếp cũ sẽ thành lối ra bếp mới, có thể đổi sang cửa nhôm kính mờ cho sáng mà vẫn kín.</p></article>
+      <article class="card reveal"><h3 class="card__title">Cửa 1 thành cửa sổ</h3>
+        <p class="card__body">Ba cửa cùng mở ra ngoài thì phòng ngủ khó kín, khó giữ mát, lại nhiều chỗ phải khoá.
+          Cửa 1 nằm sát đầu giường nên là cửa nên bịt: xây bậu cao 90 cm rồi lắp cửa sổ nhôm kính vào phần trên.
+          Phòng vẫn đủ sáng, lại có chỗ đặt cây. Cửa 2 và cửa 3 nên thay khoá và lắp lưới chống muỗi.</p></article>
       <article class="card reveal"><h3 class="card__title">Sàn hai bên có bằng nhau không?</h3>
         <p class="card__body">Sàn SPC cần nền phẳng, mỗi 2 m lệch không quá 3 mm. Nếu chỗ vách cũ có gờ hoặc bậc,
           phải mài phẳng hoặc cán vữa tự san phẳng trước khi lát. Thêm khoảng 1–2 ngày công.</p></article>
-      <article class="card reveal"><h3 class="card__title">Phong thuỷ cơ bản đã tính</h3>
-        <p class="card__body">Đầu giường tựa tường đặc, không nằm dưới xà hay ống. Gương không chiếu thẳng vào giường.
-          Phần lớn chân giường nhìn vào tường TV chứ không thẳng cửa. Còn hướng giường hợp tuổi thì cần năm sinh của hai người
-          và hướng nhà (xem mục <a href="#can-cung-cap">cần anh gửi</a>).</p></article>
+      <article class="card reveal"><h3 class="card__title">Nhà tắm cách 15 m</h3>
+        <p class="card__body">Đêm ra nhà tắm phải đi một quãng ngoài trời. Nên lắp đèn cảm biến chuyển động từ cửa 3 tới nhà tắm,
+          và lắp đèn ngủ chân giường. Nếu muốn tiện hơn nữa thì làm một bồn rửa mặt nhỏ cạnh bàn trang điểm:
+          đường cấp và thoát nước của bồn rửa bát cũ vẫn còn ngay ở tường đó, chỉ cần không bịt hẳn khi tháo bếp.</p></article>
     </div>
   </div>
 </section>
@@ -379,10 +383,10 @@ document.documentElement.className += ' js';
   <div class="wrap">
     <div class="section__head reveal">
       <span class="section__kicker">Dự trù chi phí</span>
-      <h2 class="section__title">Khoảng <span id="costTotal">79–127 triệu</span></h2>
-      <p class="section__sub">Giá tham khảo ở Hà Nội cho phòng khoảng 22 m², đã gồm nhân công. Bỏ tick hạng mục nào
+      <h2 class="section__title">Khoảng <span id="costTotal">82–132 triệu</span></h2>
+      <p class="section__sub">Giá tham khảo ở Hà Nội cho phòng 23 m², đã gồm nhân công. Bỏ tick hạng mục nào
         tự lo được hoặc dùng lại đồ cũ (giường, TV…) thì tổng sẽ tự trừ đi. Nên để thêm 10% dự phòng phát sinh.
-        Đang chọn <strong id="costCount">12/12 hạng mục</strong>.</p>
+        Đang chọn <strong id="costCount">13/13 hạng mục</strong>.</p>
     </div>
     <div class="table-scroll reveal">
       <table class="cost">
@@ -390,10 +394,11 @@ document.documentElement.className += ' js';
         <thead><tr><th scope="col">Tính</th><th scope="col">Hạng mục</th><th scope="col" class="num">Triệu đồng</th></tr></thead>
         <tbody>
           <tr data-cost data-lo="3" data-hi="5"><td><input type="checkbox" checked aria-label="Tính hạng mục tháo dỡ"></td><td>Tháo vách, đập bệ bếp, bịt nước · gas · thoát sàn, chở phế thải</td><td class="num">3–5</td></tr>
+          <tr data-cost data-lo="3" data-hi="5"><td><input type="checkbox" checked aria-label="Tính hạng mục bịt cửa 1"></td><td>Bịt cửa 1: xây bậu 90 cm, trát, lắp cửa sổ nhôm kính có song</td><td class="num">3–5</td></tr>
           <tr data-cost data-lo="9" data-hi="14"><td><input type="checkbox" checked aria-label="Tính hạng mục tường"></td><td>Bóc xốp dán tường, chống thấm chân tường, bả và sơn khoảng 60 m² tường</td><td class="num">9–14</td></tr>
           <tr data-cost data-lo="7" data-hi="10"><td><input type="checkbox" checked aria-label="Tính hạng mục trần"></td><td>Trần thạch cao giật cấp + khe LED hắt</td><td class="num">7–10</td></tr>
           <tr data-cost data-lo="5" data-hi="8"><td><input type="checkbox" checked aria-label="Tính hạng mục điện"></td><td>Điện: dây mới, ổ cắm, công tắc đảo chiều, đèn thả, đèn âm trần</td><td class="num">5–8</td></tr>
-          <tr data-cost data-lo="8" data-hi="12"><td><input type="checkbox" checked aria-label="Tính hạng mục sàn"></td><td>Sàn SPC lát đè khoảng 23 m² + nẹp, len chân tường</td><td class="num">8–12</td></tr>
+          <tr data-cost data-lo="8" data-hi="12"><td><input type="checkbox" checked aria-label="Tính hạng mục sàn"></td><td>Sàn SPC lát đè 23 m² (+5% hao hụt) + nẹp, len chân tường</td><td class="num">8–12</td></tr>
           <tr data-cost data-lo="16" data-hi="24"><td><input type="checkbox" checked aria-label="Tính hạng mục tủ quần áo"></td><td>Tủ quần áo cửa lùa 2,4 m kịch trần, MDF chống ẩm</td><td class="num">16–24</td></tr>
           <tr data-cost data-lo="10" data-hi="18"><td><input type="checkbox" checked aria-label="Tính hạng mục giường"></td><td>Giường 1m8 đầu bọc nỉ + nệm + 2 tab treo</td><td class="num">10–18</td></tr>
           <tr data-cost data-lo="5" data-hi="8"><td><input type="checkbox" checked aria-label="Tính hạng mục vách đầu giường"></td><td>Vách lam đầu giường + LED</td><td class="num">5–8</td></tr>
@@ -437,30 +442,33 @@ document.documentElement.className += ' js';
 <section class="section section--alt" id="can-cung-cap">
   <div class="wrap">
     <div class="section__head reveal">
-      <span class="section__kicker">Để vẽ bản thứ hai chính xác</span>
-      <h2 class="section__title">Thông tin cần anh gửi</h2>
-      <p class="section__sub">Không cần đủ hết một lần. Ba mục đầu là quan trọng nhất, có ba mục đó là mặt bằng đúng được khoảng 90%.</p>
+      <span class="section__kicker">Thông tin</span>
+      <h2 class="section__title">Đã có đủ để vẽ, còn vài chỗ cần đo thêm</h2>
+      <p class="section__sub">Các mục đã nhận đều đã đưa vào mặt bằng và 3D. Ba mục còn thiếu không làm thay đổi bố cục,
+        chỉ cần khi đặt đóng đồ và đi điện.</p>
     </div>
-    <ol class="asks">
-      <li class="card reveal"><h3>Số đo phòng</h3>
-        <p>Chiều rộng, chiều dài lòng trong (sau khi bỏ vách), khoảng cách từ tường cửa sổ nhỏ đến vách, và chiều cao từ sàn đến trần.
-          Dùng thước dây hoặc thước laser, đo sát chân tường.</p></li>
-      <li class="card reveal"><h3>Vị trí và kích thước từng cửa</h3>
-        <p>Mỗi cửa và cửa sổ: rộng bao nhiêu, cách góc tường gần nhất bao nhiêu, mở vào hay mở ra.
-          Chụp thêm một tấm ảnh đứng ở góc phòng, chụp ngang cho thấy cả bức tường phía sân.</p></li>
-      <li class="card reveal"><h3>Ba cửa đi đâu, giữ cửa nào</h3>
-        <p>Cửa đôi gỗ kính dẫn vào nhà chính hay ra sân? Sau khi chuyển bếp ra ngoài, anh muốn giữ cả cửa ra vườn
-          lẫn cửa phía bếp cũ, hay bịt bớt một cửa để thêm tường kê đồ?</p></li>
-      <li class="card reveal"><h3>Nhà vệ sinh</h3>
-        <p>Nhà vệ sinh hiện ở đâu? Phòng đang có sẵn đường nước của bếp cũ, nên có thể làm thêm lavabo rửa mặt ngay trong phòng,
-          hoặc nếu đủ chỗ thì làm luôn một WC riêng. Đây là nâng cấp đáng tiền cho phòng cưới.</p></li>
-      <li class="card reveal"><h3>Hướng nhà và năm sinh</h3>
-        <p>Bức tường có cửa ra vườn quay về hướng nào (mở la bàn trên điện thoại, đứng quay lưng vào tường đó).
-          Kèm năm sinh của anh và Ngọc Anh để chọn hướng đầu giường hợp tuổi.</p></li>
-      <li class="card reveal"><h3>Đồ giữ lại và ngân sách</h3>
-        <p>Giữ những gì: TV, điều hoà (bao nhiêu BTU), giường cũ? Tổng ngân sách dự kiến bao nhiêu,
-          tự thuê thợ lẻ hay khoán trọn gói? Ngọc Anh nghiêng về bảng màu nào?</p></li>
-    </ol>
+    <div class="grid grid--2">
+      <div class="card reveal">
+        <h3 class="card__title"><span class="pill pill--ok">Đã nhận</span></h3>
+        <ul class="got">
+          <li>Sàn 7,2 × 20 viên gạch 40 cm (2,88 × 8 m), vách cũ ở viên thứ 10</li>
+          <li>Ba cửa 80 × 190 cm. Cửa 1 cách tường cửa sổ nhỏ 55 cm, cửa 3 cách tường bếp cũ 220 cm</li>
+          <li>Mảng tường dưới điều hoà rộng 160 cm</li>
+          <li>Cả ba cửa đều ra ngoài, được bịt bớt. Nhà tắm ở ngoài, phía cửa 3, cách 15 m</li>
+          <li>Bỏ qua hướng nhà. Ngân sách để mở, bố trí theo mức vừa phải</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h3 class="card__title"><span class="pill pill--gold">Còn cần đo</span></h3>
+        <ol class="asks-short">
+          <li><strong>Chiều cao trần hiện tại</strong>, đo từ sàn lên. Cần để tính trần thạch cao và chiều cao tủ kịch trần.</li>
+          <li><strong>Cửa sổ chỗ bồn rửa cũ</strong> rộng bao nhiêu, cách tường đầu giường bao nhiêu. Bàn trang điểm sẽ căn giữa cửa sổ này.</li>
+          <li><strong>Điều hoà hiện tại bao nhiêu BTU</strong>. Xem trên tem dán ở cục lạnh: 9.000 thì nên đổi, 12.000 thì giữ được.</li>
+        </ol>
+        <p class="asks-note">Nếu kiểm tra lại thấy cửa 1 và cửa 3 bị đánh số ngược (cửa 1 sát tường bếp cũ),
+          anh báo lại, mình sẽ đảo vị trí ba cửa và xếp lại đồ.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -483,7 +491,7 @@ document.documentElement.className += ' js';
           <li><a href="#mat-bang">Mặt bằng trước &amp; sau</a></li>
           <li><a href="#phoi-canh">Phối cảnh 3D</a></li>
           <li><a href="#chi-phi">Dự trù chi phí</a></li>
-          <li><a href="#can-cung-cap">Thông tin cần anh gửi</a></li>
+          <li><a href="#can-cung-cap">Thông tin còn thiếu</a></li>
         </ul>
       </div>
       <div>
@@ -496,7 +504,7 @@ document.documentElement.className += ' js';
     </div>
     <div class="footer__bottom">
       <span>© <span id="year">2026</span> · Tài liệu cá nhân</span>
-      <span>Kích thước là ước lượng từ ảnh. Giá là tham khảo, hỏi lại thợ trước khi chốt.</span>
+      <span>Kích thước tính theo gạch lát 40 × 40 cm. Giá là tham khảo, hỏi lại thợ trước khi chốt.</span>
     </div>
   </div>
 </footer>

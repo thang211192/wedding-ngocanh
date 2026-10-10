@@ -82,6 +82,7 @@
 [data-theme="dark"] .pl-badge-t { fill: #21151c; }
 .pl-ac { fill: none; stroke: var(--pl-mute); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .pl-rose { fill: var(--rose); }
+.pl-door { font-size: 14px; font-weight: 700; fill: var(--pl-ink); }
 .pl-small { font-size: 13px; fill: var(--pl-mute); }
 .pl-center { text-anchor: middle; }
 .pl-dim { stroke: var(--pl-mute); stroke-width: 1.5; marker-start: none; }
@@ -165,21 +166,10 @@
 .cost tr[data-off="true"] td:not(:first-child) { color: var(--ink-3); text-decoration: line-through; }
 .cost-tip { margin-top: var(--s-5); }
 
-/* ---------- Danh sách kiểm & câu hỏi ---------- */
+/* ---------- Danh sách kiểm ---------- */
 .checks { list-style: none; margin: 0; padding: 0; }
 .checks li { display: flex; gap: 12px; align-items: flex-start; padding: var(--s-4); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); }
 .checks .ico { flex: none; color: var(--ok); margin-top: 2px; }
-.asks { list-style: none; counter-reset: ask; margin: 0; padding: 0; display: grid; gap: var(--s-4); grid-template-columns: 1fr; }
-@media (min-width: 720px) { .asks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1040px) { .asks { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.asks li { counter-increment: ask; position: relative; padding-top: var(--s-6); }
-.asks li::before {
-  content: counter(ask); position: absolute; top: var(--s-4); left: var(--s-5);
-  font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--rose); line-height: 1;
-}
-.asks h3 { font-size: 1.1rem; margin: var(--s-3) 0 var(--s-2); }
-.asks p { margin: 0; color: var(--ink-2); font-size: .94rem; }
-.asks li:nth-child(-n+3) { border-color: var(--border-strong); }
 
 @media (prefers-reduced-motion: reduce) { .pal { transition: none; } .pal:hover { transform: none; } }
 
@@ -188,3 +178,9 @@
   .plan__canvas { min-width: 0; }
   .v3d__canvas { height: 420px; }
 }
+
+/* Thông tin đã nhận / còn thiếu */
+.got, .asks-short { margin: var(--s-3) 0 0; padding-left: 1.2em; color: var(--ink-2); display: grid; gap: var(--s-2); font-size: .95rem; }
+.got li::marker { color: var(--ok); }
+.asks-short li::marker { color: var(--gold); font-weight: 700; }
+.asks-note { margin: var(--s-4) 0 0; font-size: .88rem; color: var(--ink-3); }

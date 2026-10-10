@@ -20,8 +20,10 @@
   var KEY = 'wnc:room';
   var H = 3.0; // trần sau khi làm thạch cao
 
-  var DEFAULT = { W: 3.4, L: 6.6, P: 3.4 };
-  var LIMITS = { W: [2.6, 5], L: [4.5, 9], P: [2.2, 6] };
+  // Số đo thật theo gạch lát 40 × 40 cm: 7,2 × 20 viên, vách cũ ở viên thứ 10.
+  var DEFAULT = { W: 2.88, L: 8, P: 4 };
+  var LIMITS = { W: [2.6, 5], L: [7, 10], P: [3.8, 6] };
+  var VERSION = 2; // tăng khi DEFAULT đổi, để số cũ đã lưu không đè số đo mới
 
   var PALETTES = {
     kem: {
@@ -50,10 +52,11 @@
   };
 
   var saved = store.get();
+  var savedDims = saved.v === VERSION ? saved : {};
   var dims = {
-    W: num(saved.W, DEFAULT.W, LIMITS.W),
-    L: num(saved.L, DEFAULT.L, LIMITS.L),
-    P: num(saved.P, DEFAULT.P, LIMITS.P)
+    W: num(savedDims.W, DEFAULT.W, LIMITS.W),
+    L: num(savedDims.L, DEFAULT.L, LIMITS.L),
+    P: num(savedDims.P, DEFAULT.P, LIMITS.P)
   };
   dims.P = Math.min(dims.P, dims.L - 2);
   var state = {
@@ -68,7 +71,7 @@
     if (!isFinite(n)) return d;
     return Math.min(lim[1], Math.max(lim[0], Math.round(n * 100) / 100));
   }
-  function persist() { store.set({ W: dims.W, L: dims.L, P: dims.P, palette: state.palette }); }
+  function persist() { store.set({ v: VERSION, W: dims.W, L: dims.L, P: dims.P, palette: state.palette }); }
   var vn = function (n) { return String(Math.round(n * 100) / 100).replace('.', ','); };
 
   /* ---------------------------------------------------------------------
@@ -77,63 +80,67 @@
   function layout(d) {
     var W = d.W, L = d.L, P = d.P;
 
-    // Tường phía sân (x = 0): cửa ra vườn sát tường cửa sổ nhỏ, cửa đôi sát
-    // vách cũ, cửa ra ngoài của bếp cũ gần tường bếp.
-    var garden = { wall: 'A', from: 0.25, to: 1.05, bottom: 0, top: 2.2, kind: 'door', name: 'Cửa ra vườn' };
-    var dbl = { wall: 'A', from: Math.max(1.6, P - 1.05), to: Math.max(2.5, P - 0.15), bottom: 0, top: 2.2, kind: 'door2', name: 'Cửa đôi gỗ kính' };
-    var outer = { wall: 'A', from: L - 1.35, to: L - 0.55, bottom: 0, top: 2.2, kind: 'door', name: 'Cửa ra ngoài (bếp cũ)' };
-    var winB = { wall: 'B', from: W / 2 - 0.4, to: W / 2 + 0.4, bottom: 1.9, top: 2.5, kind: 'window', name: 'Cửa sổ nhỏ' };
+    // Ba cửa cùng nằm trên tường phía sân, đều 80 × 190 cm, có ô kính phía trên.
+    // Đánh số 1 → 3 từ tường cửa sổ nhỏ sang tường bếp cũ (theo số đo đã gửi):
+    //   cửa 1 cách tường cửa sổ nhỏ 55 cm · mảng tường dưới điều hoà 160 cm ·
+    //   cửa 2 hai cánh · cửa 3 cách tường bếp cũ 220 cm, là lối ra nhà tắm.
+    var d1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 1' };
+    var d2 = { wall: 'A', from: 2.95, to: 3.75, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', label: 'Cửa 2' };
+    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 3 · ra nhà tắm' };
+    // Phương án mới: xây bậu nửa dưới cửa 1, thành cửa sổ (giữ ánh sáng, bớt một lối ra ngoài).
+    var w1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0.9, top: 2.3, kind: 'window', label: 'Cửa 1 → cửa sổ' };
+    var winB = { wall: 'B', from: W / 2 - 0.4, to: W / 2 + 0.4, bottom: 1.9, top: 2.5, kind: 'window' };
     var sinkC = Math.min(W - 1.2, Math.max(1.1, W * 0.5));
-    var winK = { wall: 'K', from: sinkC - 0.45, to: sinkC + 0.45, bottom: 1.15, top: 1.85, kind: 'window', name: 'Cửa sổ chỗ bồn rửa cũ' };
-    var ventK = { wall: 'K', from: Math.max(0.3, sinkC - 1.1), to: Math.max(0.75, sinkC - 0.65), bottom: 2.35, top: 2.75, kind: 'window', name: 'Ô thoáng' };
-    var openings = [garden, dbl, outer, winB, winK, ventK];
+    var winK = { wall: 'K', from: sinkC - 0.45, to: sinkC + 0.45, bottom: 1.15, top: 1.85, kind: 'window' };
+    var ventK = { wall: 'K', from: Math.max(0.3, sinkC - 1.1), to: Math.max(0.75, sinkC - 0.65), bottom: 2.35, top: 2.75, kind: 'window' };
+    var common = [d2, d3, winB, winK, ventK];
 
     // --- Phương án mới ---
-    var tvC = (garden.to + dbl.from) / 2;
-    var bedZ0 = Math.max(0.55, tvC - 0.9);
-    bedZ0 = Math.min(bedZ0, P - 2.35);
-    bedZ0 = Math.max(0.5, bedZ0);
-    var bed = { x0: W - 2.12, x1: W, z0: bedZ0, z1: bedZ0 + 1.8 };
-    var wrLen = Math.max(1.2, Math.min(2.4, L - P - 0.9));
+    // Giường nằm gọn trên mảng tường giữa cửa 1 và cửa 2, chân giường nhìn vào TV.
+    var tvC = (d1.to + d2.from) / 2;
+    var bed = { x0: W - 2.08, x1: W, z0: tvC - 0.9, z1: tvC + 0.9 };
+    var wrLen = Math.max(1.2, Math.min(2.4, L - P - 1.6));
     var wardrobe = { x0: W - 0.6, x1: W, z0: P + 0.15, z1: P + 0.15 + wrLen };
-    var sofaLen = Math.max(1.0, Math.min(1.45, outer.from - P - 0.4));
-    var sofa = { x0: 0, x1: 0.8, z0: P + 0.25, z1: P + 0.25 + sofaLen };
+    var sofa = { x0: 0, x1: 0.8, z0: d3.to + 0.2, z1: Math.min(d3.to + 1.65, L - 0.62) };
     var sofaC = (sofa.z0 + sofa.z1) / 2;
     var deskW = Math.min(1.2, W - 1.0);
-    var desk = { x0: sinkC - deskW / 2, x1: sinkC + deskW / 2, z0: L - 0.5, z1: L };
     var featZ0 = Math.max(0.05, bed.z0 - 0.65), featZ1 = Math.min(P - 0.05, bed.z1 + 0.65);
 
     var moi = [
-      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu giường bọc nỉ', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
+      { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc nỉ, nằm gọn giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
       { id: 'ns1', n: 2, name: 'Tab đầu giường treo tường + đèn thả (×2)', x0: W - 0.45, x1: W, z0: bed.z0 - 0.5, z1: bed.z0 - 0.05, kind: 'wood' },
       { id: 'ns2', n: 2, name: '', x0: W - 0.45, x1: W, z0: bed.z1 + 0.05, z1: bed.z1 + 0.5, kind: 'wood' },
       { id: 'feat', n: 3, name: 'Vách lam gỗ + LED hắt sau đầu giường', x0: W - 0.06, x1: W, z0: featZ0, z1: featZ1, kind: 'feat' },
-      { id: 'tv', n: 4, name: 'TV 50" treo tường + kệ treo, ngay dưới điều hoà', x0: 0, x1: 0.3, z0: tvC - 0.65, z1: tvC + 0.65, kind: 'tv' },
-      { id: 'rug', n: 5, name: 'Thảm trải dưới 2/3 giường', x0: bed.x0 - 0.55, x1: W - 0.75, z0: bed.z0 - 0.35, z1: bed.z1 + 0.35, kind: 'rug' },
+      { id: 'tv', n: 4, name: 'TV 50" treo sát mảng tường 160 cm, ngay dưới điều hoà', x0: 0, x1: 0.08, z0: tvC - 0.6, z1: tvC + 0.6, kind: 'tv' },
+      { id: 'rug', n: 5, name: 'Thảm trải dưới giường', x0: Math.max(0.15, bed.x0 - 0.5), x1: W - 0.75, z0: bed.z0 - 0.35, z1: bed.z1 + 0.35, kind: 'rug' },
       { id: 'wr', n: 6, name: 'Tủ quần áo cửa lùa ' + vn(wrLen) + ' m, kịch trần', x0: wardrobe.x0, x1: wardrobe.x1, z0: wardrobe.z0, z1: wardrobe.z1, kind: 'wardrobe' },
-      { id: 'mirror', n: 7, name: 'Gương soi toàn thân', x0: W - 0.08, x1: W, z0: wardrobe.z1 + 0.15, z1: Math.min(L - 0.1, wardrobe.z1 + 0.65), kind: 'mirror' },
-      { id: 'desk', n: 8, name: 'Bàn trang điểm / làm việc dưới cửa sổ', x0: desk.x0, x1: desk.x1, z0: desk.z0, z1: desk.z1, kind: 'wood' },
-      { id: 'stool', n: 0, name: '', x0: sinkC - 0.2, x1: sinkC + 0.2, z0: L - 0.95, z1: L - 0.55, kind: 'stool' },
+      { id: 'mirror', n: 7, name: 'Gương soi toàn thân', x0: W - 0.08, x1: W, z0: wardrobe.z1 + 0.15, z1: Math.min(L - 0.6, wardrobe.z1 + 0.65), kind: 'mirror' },
+      { id: 'desk', n: 8, name: 'Bàn trang điểm / làm việc dưới cửa sổ', x0: sinkC - deskW / 2, x1: sinkC + deskW / 2, z0: L - 0.5, z1: L, kind: 'wood' },
+      { id: 'stool', n: 0, name: '', x0: sinkC - 0.2, x1: sinkC + 0.2, z0: L - 0.8, z1: L - 0.4, kind: 'stool' },
       { id: 'sofa', n: 9, name: 'Sofa 2 chỗ + bàn trà tròn', x0: sofa.x0, x1: sofa.x1, z0: sofa.z0, z1: sofa.z1, kind: 'sofa' },
-      { id: 'table', n: 0, name: '', x0: 1.0, x1: 1.6, z0: sofaC - 0.3, z1: sofaC + 0.3, kind: 'round' },
-      { id: 'rug2', n: 0, name: '', x0: 0.3, x1: 2.0, z0: sofa.z0 - 0.1, z1: sofa.z1 + 0.1, kind: 'rug' },
-      { id: 'plant', n: 10, name: 'Cây xanh (lưỡi hổ / bàng Singapore)', x0: 0.1, x1: 0.5, z0: L - 0.48, z1: L - 0.08, kind: 'plant' }
+      { id: 'table', n: 0, name: '', x0: 0.95, x1: 1.45, z0: sofaC - 0.4, z1: sofaC + 0.1, kind: 'round' },
+      { id: 'rug2', n: 0, name: '', x0: 0.3, x1: Math.min(1.9, W - 0.7), z0: sofa.z0 - 0.1, z1: sofa.z1 + 0.1, kind: 'rug' },
+      { id: 'plant', n: 10, name: 'Cây xanh cạnh cửa sổ mới (cửa 1 cũ)', x0: 0.08, x1: 0.48, z0: 0.08, z1: 0.48, kind: 'plant' },
+      { id: 'shoe', n: 11, name: 'Tủ giày thấp + móc khăn cạnh cửa 3', x0: 0, x1: 0.35, z0: P + 0.15, z1: Math.min(d3.from - 0.1, P + 0.85), kind: 'wood' }
     ];
 
     // --- Hiện trạng ---
-    var pDoor = { from: 0.45, to: 1.15 };
     var cu = [
       { id: 'obed', n: 1, name: 'Giường cũ 1m6, kê dọc tường cửa sổ nhỏ', x0: W - 2.0, x1: W, z0: 0.05, z1: 1.65, kind: 'bed' },
       { id: 'otv', n: 2, name: 'Tủ TV + loa', x0: W - 0.45, x1: W, z0: 1.85, z1: Math.min(P - 0.1, 3.15), kind: 'wood' },
-      { id: 'ochair', n: 3, name: 'Ghế gỗ + quạt cây', x0: 0.75, x1: 1.15, z0: 0.08, z1: 0.48, kind: 'stool' },
-      { id: 'opart', n: 4, name: 'Vách nhôm kính + cửa (sẽ tháo)', x0: 0, x1: W, z0: P - 0.04, z1: P + 0.04, kind: 'partition', door: pDoor },
+      { id: 'ochair', n: 3, name: 'Ghế gỗ + quạt cây', x0: 0.3, x1: 0.7, z0: 0.08, z1: 0.48, kind: 'stool' },
+      { id: 'opart', n: 4, name: 'Vách nhôm kính + cửa (sẽ tháo)', x0: 0, x1: W, z0: P - 0.04, z1: P + 0.04, kind: 'partition', door: { from: 0.45, to: 1.15 } },
       { id: 'otable', n: 5, name: 'Bàn ăn oval + 6 ghế', x0: W * 0.45 - 0.8, x1: W * 0.45 + 0.8, z0: P + 0.35, z1: P + 1.25, kind: 'round' },
       { id: 'ocounter', n: 6, name: 'Bệ bếp xây + bồn rửa + bếp gas (chuyển ra ngoài)', x0: 0.5, x1: W - 0.3, z0: L - 0.6, z1: L, kind: 'counter' },
       { id: 'opur', n: 7, name: 'Máy lọc nước', x0: 0.05, x1: 0.45, z0: L - 0.45, z1: L - 0.05, kind: 'wood' },
-      { id: 'ofan', n: 8, name: 'Quạt treo tường', x0: 0, x1: 0.25, z0: outer.from - 0.6, z1: outer.from - 0.2, kind: 'fan' }
+      { id: 'ofan', n: 8, name: 'Quạt treo tường', x0: 0, x1: 0.25, z0: d3.from - 0.6, z1: d3.from - 0.2, kind: 'fan' }
     ];
 
-    return { W: W, L: L, P: P, openings: openings, moi: moi, cu: cu, tvC: tvC, bed: bed, sinkC: sinkC, sofa: sofa, wardrobe: wardrobe };
+    return {
+      W: W, L: L, P: P, moi: moi, cu: cu, tvC: tvC, bed: bed, sinkC: sinkC, sofa: sofa, wardrobe: wardrobe,
+      openings: [w1].concat(common),
+      openingsCu: [d1].concat(common)
+    };
   }
 
   /* ---------------------------------------------------------------------
@@ -175,7 +182,8 @@
     svg.appendChild(el('rect', { x: X(0) - T * S / 2, y: Y(W) - T * S / 2, width: L * S + T * S, height: W * S + T * S, class: 'pl-wall' }));
 
     // Cửa & cửa sổ
-    lay.openings.forEach(function (o) {
+    (mode === 'moi' ? lay.openings : lay.openingsCu).forEach(function (o) {
+      if (o.label) svg.appendChild(el('text', { x: X((o.from + o.to) / 2), y: Y(0) + T * S / 2 + 18, class: 'pl-door pl-center' }, o.label));
       var g = el('g', { class: 'pl-open pl-open--' + o.kind });
       var a, b, isZ = o.wall === 'A' || o.wall === 'C';
       if (isZ) {
@@ -206,13 +214,13 @@
     // Vách cũ (ở mặt bằng mới: nét đứt)
     if (mode === 'moi') {
       svg.appendChild(el('line', { x1: X(P), y1: Y(W), x2: X(P), y2: Y(0), class: 'pl-oldwall' }));
-      svg.appendChild(el('text', { x: X(P), y: Y(0) + T * S / 2 + 18, class: 'pl-small pl-center pl-rose' }, 'vách cũ · rèm voan'));
+      svg.appendChild(el('text', { x: X(P), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center pl-rose' }, 'vách cũ · rèm voan'));
     }
 
     // Điều hoà (treo cao trên tường phía sân, vẽ nét đứt để không che đồ bên dưới)
     var acZ = lay.tvC;
     svg.appendChild(el('rect', { x: X(acZ - 0.4), y: Y(0) - 24, width: 80, height: 18, rx: 3, class: 'pl-ac' }));
-    svg.appendChild(el('text', { x: X(acZ), y: Y(0) + T * S / 2 + 18, class: 'pl-small pl-center' }, mode === 'moi' ? 'điều hoà phía trên TV' : 'điều hoà (trên cao)'));
+    svg.appendChild(el('text', { x: X(acZ), y: Y(0) + T * S / 2 + 38, class: 'pl-small pl-center' }, mode === 'moi' ? 'điều hoà phía trên TV' : 'điều hoà (trên cao)'));
 
     // Đồ đạc
     var items = mode === 'moi' ? lay.moi : lay.cu;
@@ -263,7 +271,7 @@
     svg.appendChild(el('text', { x: dimX - 8, y: Y(W / 2), class: 'pl-dimt pl-center', transform: 'rotate(-90 ' + (dimX - 8) + ' ' + Y(W / 2) + ')' }, vn(W) + ' m'));
 
     // Tên tường
-    svg.appendChild(el('text', { x: X(L / 2), y: Y(0) + T * S / 2 + 48, class: 'pl-wallname pl-center' }, 'PHÍA SÂN · 3 CỬA'));
+    svg.appendChild(el('text', { x: X(L / 2), y: Y(0) + T * S / 2 + 64, class: 'pl-wallname pl-center' }, 'PHÍA SÂN'));
     svg.appendChild(el('text', { x: X(L) + T * S / 2 + 30, y: Y(W / 2), class: 'pl-wallname pl-center', transform: 'rotate(90 ' + (X(L) + T * S / 2 + 30) + ' ' + Y(W / 2) + ')' }, 'TƯỜNG BẾP CŨ'));
 
     // Diện tích
@@ -551,7 +559,7 @@
         tong: { target: [W / 2, 0.6, L / 2], pos: [W / 2 - (W / 2 + L * 0.55) * far, L * 0.95 * far, L / 2 + L * 0.45 * far] },
         tren: tall
           ? { target: [W / 2, 0, L / 2], pos: [W / 2, L * 1.45 * far * 0.8, L / 2 + 0.12] }
-          : { target: [W / 2, 0, L / 2], pos: [W / 2 - 0.12, L * 1.45, L / 2] },
+          : { target: [W / 2, 0, L / 2], pos: [W / 2 - 0.12, Math.max(6.5, L * 1.05), L / 2] },
         giuong: { target: [W - 0.4, 1.0, lay.bed.z0 + 0.9], pos: [0.35, 1.55, lay.bed.z0 + 0.9 + 0.15] },
         nhinra: { target: [0.9, 0.9, L - 0.9], pos: [W - 0.7, 1.6, Math.max(0.5, lay.bed.z0 - 0.2)] },
         thaydo: { target: [W - 0.9, 1.0, L - 0.6], pos: [0.45, 1.6, P + 0.1] }
@@ -702,7 +710,7 @@
         ops.forEach(function (o) {
           seg(cur, o.from, 0, H);
           seg(o.from, o.to, 0, o.bottom);
-          seg(o.from, o.to, o.top, H);
+          seg(o.from, o.to, o.head || o.top, H);
           cur = o.to;
           fillOpening(g, k, o, W, L);
         });
@@ -757,16 +765,18 @@
         [[o.from, mid], [mid, o.to]].forEach(function (lf) {
           pane(leafMat, lf[0] + 0.01, lf[1] - 0.01, 0, o.top, 0.045);
           for (var r = 0; r < 3; r++) {
-            var y0 = 1.0 + r * 0.38;
-            pane(mats.glass, lf[0] + 0.08, lf[1] - 0.08, y0, y0 + 0.3, 0.05, -0.06);
+            var y0 = 0.85 + r * 0.33;
+            pane(mats.glass, lf[0] + 0.07, lf[1] - 0.07, y0, y0 + 0.26, 0.05, -0.06);
           }
         });
-        pane(mats.glass, o.from, o.to, o.top + 0.05, o.top + 0.4, 0.02);
-        pane(mats.frame, o.from, o.to, o.top, o.top + 0.05, 0.1);
       } else {
         pane(leafMat, o.from + 0.01, o.to - 0.01, 0, o.top, 0.045);
-        pane(mats.glass, o.from + 0.12, o.to - 0.12, 1.1, 1.95, 0.05);
+        pane(mats.glass, o.from + 0.12, o.to - 0.12, 1.0, 1.75, 0.05);
         pane(mats.metal, o.from + w - 0.12, o.from + w - 0.08, 0.95, 1.12, 0.08);
+      }
+      if (o.head) {
+        pane(mats.frame, o.from, o.to, o.top, o.top + 0.05, 0.1);
+        pane(mats.glass, o.from, o.to, o.top + 0.05, o.head, 0.02);
       }
     }
 
@@ -844,8 +854,7 @@
       var tv = get('tv'), tz = (tv.z0 + tv.z1) / 2;
       box(R, mats.black, 0.02, 0.05, 1.0, 1.64, tz - 0.56, tz + 0.56);
       box(R, mats.screen, 0.05, 0.052, 1.02, 1.62, tz - 0.54, tz + 0.54, { shadow: false });
-      box(R, mats.wood, 0, 0.32, 0.45, 0.6, tz - 0.7, tz + 0.7);
-      box(R, mats.black, 0.08, 0.2, 0.6, 0.66, tz - 0.4, tz + 0.4);
+      box(R, mats.black, 0.02, 0.09, 0.9, 0.96, tz - 0.45, tz + 0.45); // loa thanh treo dưới TV
       // Điều hoà
       box(R, mats.white, 0, 0.22, 2.3, 2.6, tz - 0.42, tz + 0.42);
 
@@ -905,12 +914,12 @@
       var cuS = box(R, mats.accent, s.x0 + 0.2, s.x0 + 0.32, 0.5, 0.8, s.z0 + 0.2, s.z0 + 0.55);
       cuS.rotation.z = -0.2;
       var tb = get('table'), tcx = (tb.x0 + tb.x1) / 2, tcz = (tb.z0 + tb.z1) / 2;
-      cyl(R, mats.wood, 0.3, 0.03, tcx, 0.42, tcz, 48);
+      cyl(R, mats.wood, (tb.x1 - tb.x0) / 2, 0.03, tcx, 0.42, tcz, 48);
       cyl(R, mats.metal, 0.025, 0.42, tcx, 0, tcz, 12);
       cyl(R, mats.metal, 0.16, 0.015, tcx, 0, tcz, 24);
       cyl(R, mats.pot, 0.05, 0.16, tcx + 0.08, 0.45, tcz, 16);
       // đèn cây cạnh sofa
-      var lz = Math.max(s.z0 - 0.15, P + 0.02);
+      var lz = Math.min(s.z1 + 0.18, L - 0.2);
       cyl(R, mats.metal, 0.12, 0.02, 0.25, 0, lz, 24);
       cyl(R, mats.metal, 0.012, 1.45, 0.25, 0.02, lz, 8);
       var shade = add(R, new T3.CylinderGeometry(0.13, 0.17, 0.25, 32, 1, true), mats.bulb, 0.25, 1.5, lz);
@@ -919,6 +928,17 @@
       fl.position.set(0.3, 1.45, lz + 0.05);
       scene.add(fl);
       nightLights.push(fl);
+
+      // --- Tủ giày + móc khăn cạnh cửa 3 ---
+      var sh = get('shoe');
+      if (sh.z1 - sh.z0 > 0.3) {
+        box(R, mats.wardrobe, sh.x0, sh.x1, 0.1, 0.95, sh.z0, sh.z1);
+        box(R, mats.wood, sh.x0, sh.x1 + 0.01, 0.95, 0.98, sh.z0, sh.z1);
+        box(R, mats.wood, 0, 0.03, 1.55, 1.62, sh.z0 + 0.05, sh.z1 - 0.05);
+        [0.2, 0.45].forEach(function (f) {
+          box(R, mats.metal, 0.03, 0.09, 1.5, 1.55, sh.z0 + f * (sh.z1 - sh.z0) * 1.4, sh.z0 + f * (sh.z1 - sh.z0) * 1.4 + 0.02, { shadow: false });
+        });
+      }
 
       // --- Cây xanh ---
       var pt = get('plant'), pcx = (pt.x0 + pt.x1) / 2, pcz = (pt.z0 + pt.z1) / 2;
