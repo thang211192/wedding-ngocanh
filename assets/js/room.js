@@ -25,9 +25,9 @@
   var VARIANTS = {
     tk: {
       name: 'Bản tiết kiệm', ceiling: 4.0, floor: 'tiles', bedW: 1.8, keepDoor1: true,
-      tvCab: { len: 2.0, depth: 0.42, h: 0.5 }, // kệ TV cũ dài 5 viên gạch = 2 m (sâu, cao ước theo ảnh)
+      tvCab: { len: 2.0, depth: 0.42, h: 0.6, top: 0.75, block: 0.55 }, // kệ TV cũ: dài 5 viên gạch = 2 m, hai khối ngăn kéo cao 60 cm, mặt giữa cao 75 cm
       wardrobe: { len: 1.6, h: 2.0, depth: 0.5 }, deskW: 1.0,
-      drop: ['rug', 'sofa', 'table', 'rug2', 'plant', 'plant2', 'shoe', 'hooks', 'mirror']
+      drop: ['rug', 'sofa', 'table', 'rug2', 'plant', 'plant2', 'shoe', 'hooks', 'mirror', 'desk']
     },
     full: { name: 'Bản đầy đủ', ceiling: 3.0, floor: 'spc', bedW: 1.8, keepDoor1: false, drop: [] }
   };
@@ -171,8 +171,15 @@
       // Kệ TV cũ dùng lại làm tủ thấp để đồ, kê nối tiếp sau tủ quần áo ở tường đầu giường
       var wrTk = moi.filter(function (it) { return it.id === 'wr'; })[0];
       var cz0 = wrTk.z1 + 0.1, cz1 = Math.min(cz0 + V.tvCab.len, L - 0.05);
-      moi.splice(moi.indexOf(wrTk) + 1, 0, { id: 'ketv', n: 6.5, name: 'Kệ TV cũ làm tủ thấp để đồ: ngăn kéo để đồ gấp, mặt kính bày ảnh cưới',
-        x0: W - V.tvCab.depth - 0.03, x1: W - 0.03, z0: cz0, z1: cz1, h: V.tvCab.h, kind: 'wood' });
+      var cab = { id: 'ketv', n: 6.5, name: 'Kệ TV cũ làm bàn trang điểm: tháo 2 tấm kính giữa, ngồi dưới mặt cao 75 cm, gương LED treo trên',
+        x0: W - V.tvCab.depth - 0.03, x1: W - 0.03, z0: cz0, z1: cz1, h: V.tvCab.h, top: V.tvCab.top, block: V.tvCab.block, kind: 'wood' };
+      moi.splice(moi.indexOf(wrTk) + 1, 0, cab);
+      // Ghế trang điểm cao 45 cm kê vào khoảng trống giữa hai khối ngăn kéo
+      moi.forEach(function (it) {
+        if (it.id !== 'stool') return;
+        var mz = (cab.z0 + cab.z1) / 2;
+        it.x0 = cab.x0 - 0.45; it.x1 = cab.x0 - 0.05; it.z0 = mz - 0.2; it.z1 = mz + 0.2;
+      });
     }
     // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
     moi = moi.filter(function (it) { return (it.id !== 'hooks' || it.z1 - it.z0 >= 0.2) && (it.id !== 'shoe' || it.z1 - it.z0 >= 0.3); });
@@ -1022,14 +1029,26 @@
       // --- Kệ TV cũ làm tủ thấp để đồ (bản tiết kiệm): khung đen mặt kính + khối 2 ngăn kéo nâu ---
       var kc = get('ketv');
       if (kc) {
-        var kd = Math.min(0.45, (kc.z1 - kc.z0) / 3);
-        box(R, mats.black, kc.x0, kc.x1, 0.08, kc.h - 0.02, kc.z0, kc.z1 - kd);
-        box(R, mats.screen, kc.x0, kc.x1, kc.h - 0.02, kc.h, kc.z0, kc.z1 - kd); // mặt kính đen
-        box(R, mats.black, kc.x0 + 0.03, kc.x1 - 0.03, 0.22, 0.24, kc.z0 + 0.02, kc.z1 - kd - 0.02); // tầng giữa
-        box(R, mats.doorWood, kc.x0, kc.x1, 0.08, kc.h, kc.z1 - kd, kc.z1);
-        box(R, mats.black, kc.x0 - 0.003, kc.x0, 0.29, 0.3, kc.z1 - kd + 0.03, kc.z1 - 0.03, { shadow: false }); // khe ngăn kéo
-        [kc.z0 + 0.05, kc.z1 - 0.05].forEach(function (lz) { cyl(R, mats.metal, 0.015, 0.08, (kc.x0 + kc.x1) / 2, 0, lz, 8); });
-        box(R, mats.accent, kc.x0 + 0.1, kc.x0 + 0.3, kc.h, kc.h + 0.22, kc.z0 + 0.3, kc.z0 + 0.32); // khung ảnh cưới
+        // Hai khối ngăn kéo hai đầu (cao 60 cm), khoảng giữa đã tháo kính làm chỗ để chân, mặt giữa cao 75 cm trên trụ inox
+        var bl = kc.block, kmz = (kc.z0 + kc.z1) / 2;
+        [[kc.z0, kc.z0 + bl], [kc.z1 - bl, kc.z1]].forEach(function (zz) {
+          box(R, mats.black, kc.x0, kc.x1, 0.1, kc.h, zz[0], zz[1]);
+          box(R, mats.doorWood, kc.x0 - 0.005, kc.x0, 0.14, 0.33, zz[0] + 0.03, zz[1] - 0.03, { shadow: false });
+          box(R, mats.doorWood, kc.x0 - 0.005, kc.x0, 0.36, kc.h - 0.05, zz[0] + 0.03, zz[1] - 0.03, { shadow: false });
+          box(R, mats.screen, kc.x0, kc.x1, kc.h, kc.h + 0.008, zz[0], zz[1], { shadow: false }); // mặt kính
+        });
+        box(R, mats.black, kc.x0, kc.x1, 0.1, 0.12, kc.z0 + bl, kc.z1 - bl); // đế giữa
+        [kc.z0 + 0.1, kmz, kc.z1 - 0.1].forEach(function (lz) { cyl(R, mats.metal, 0.02, 0.1, (kc.x0 + kc.x1) / 2, 0, lz, 10); });
+        var tz0 = kc.z0 + bl * 0.6, tz1 = kc.z1 - bl * 0.6; // mặt giữa vắt qua hai khối
+        box(R, mats.black, kc.x1 - 0.32, kc.x1, kc.top - 0.05, kc.top, tz0, tz1);
+        [tz0 + 0.12, tz1 - 0.12].forEach(function (pz) { cyl(R, mats.metal, 0.02, kc.top - 0.05 - kc.h, kc.x1 - 0.16, kc.h, pz, 10); });
+        // Gương LED treo tường ngay trên mặt giữa
+        box(R, mats.frame, W - 0.025, W, 0.88, 2.0, kmz - 0.3, kmz + 0.3, { shadow: false });
+        box(R, mats.mirror, W - 0.03, W - 0.025, 0.9, 1.98, kmz - 0.28, kmz + 0.28, { shadow: false });
+        var ledM = box(R, mats.led, W - 0.032, W - 0.028, 0.88, 2.0, kmz - 0.3, kmz - 0.28, { shadow: false });
+        var ledM2 = box(R, mats.led, W - 0.032, W - 0.028, 0.88, 2.0, kmz + 0.28, kmz + 0.3, { shadow: false });
+        ledM.userData.led = ledM2.userData.led = true;
+        box(R, mats.accent, kc.x1 - 0.3, kc.x1 - 0.1, kc.top, kc.top + 0.05, kmz + 0.15, kmz + 0.3); // khay mỹ phẩm
       }
 
       // --- Gương toàn thân ---
@@ -1043,7 +1062,9 @@
       }
 
       // --- Bàn trang điểm + ghế + gương tròn ---
-      var d = get('desk'), dcx = (d.x0 + d.x1) / 2;
+      var d = get('desk');
+      if (d) {
+      var dcx = (d.x0 + d.x1) / 2;
       box(R, mats.wood, d.x0, d.x1, 0.72, 0.76, d.z0, d.z1 - 0.01);
       box(R, mats.wardrobe, d.x0 + 0.02, d.x1 - 0.02, 0.58, 0.72, d.z0 + 0.02, d.z1 - 0.01);
       // gương LED để bàn (thấp hơn bậu cửa sổ để không che sáng)
@@ -1054,11 +1075,12 @@
       rm.position.set(dcx - 0.3, 0.98, L - 0.25);
       R.add(rm);
       box(R, mats.accent, dcx + 0.15, dcx + 0.35, 0.76, 0.8, L - 0.35, L - 0.2);
-      var st = get('stool');
-      cyl(R, mats.sofa, 0.21, 0.45, (st.x0 + st.x1) / 2, 0, (st.z0 + st.z1) / 2);
       // rèm cuốn trên cửa sổ (cửa sổ hai cánh mở ra ngoài nên không vướng bàn)
       var wk = lay.openings.filter(function (o) { return o.kind === 'window' && o.wall === 'K' && o.bottom < 2; })[0];
       box(R, mats.sheer, wk.from - 0.05, wk.to + 0.05, wk.top - 0.25, wk.top + 0.08, L - 0.1, L - 0.02, { shadow: false });
+      }
+      var st = get('stool');
+      if (st) cyl(R, mats.sofa, 0.21, 0.45, (st.x0 + st.x1) / 2, 0, (st.z0 + st.z1) / 2);
 
       // --- Ghế văng có hộc (lưng tựa tường bếp cũ) + bàn trà + đèn đọc sách ---
       var s = get('sofa');
