@@ -25,7 +25,7 @@
   var VARIANTS = {
     tk: {
       name: 'Bản tiết kiệm', ceiling: 4.0, floor: 'tiles', bedW: 1.8, keepDoor1: true,
-      tvCab: { len: 1.6, depth: 0.42, h: 0.5 }, // kệ TV cũ (ước theo ảnh, anh đo lại giúp)
+      tvCab: { len: 2.0, depth: 0.42, h: 0.5 }, // kệ TV cũ dài 5 viên gạch = 2 m (sâu, cao ước theo ảnh)
       wardrobe: { len: 1.6, h: 2.0, depth: 0.5 }, deskW: 1.0,
       drop: ['rug', 'sofa', 'table', 'rug2', 'plant', 'plant2', 'shoe', 'hooks', 'mirror']
     },
