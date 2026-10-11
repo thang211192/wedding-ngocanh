@@ -20,11 +20,12 @@
   var KEY = 'wnc:room';
   var H = 3.0; // chiều cao trần của bản đang dựng (build() gán lại theo bản)
 
-  // Hai bản thiết kế. "tk" (tiết kiệm) là bản chính: dùng lại giường cũ, giữ cửa 1, đồ mua sẵn.
+  // Hai bản thiết kế. "tk" (tiết kiệm) là bản chính: giường mới 1m8 anh đã có, giữ cửa 1, đồ mua sẵn, kệ TV cũ làm tủ thấp.
   // "full" là bản đầy đủ (đồ đóng, vách lam, sofa…) giữ để so sánh.
   var VARIANTS = {
     tk: {
-      name: 'Bản tiết kiệm', ceiling: 4.0, floor: 'tiles', bedW: 1.6, keepDoor1: true,
+      name: 'Bản tiết kiệm', ceiling: 4.0, floor: 'tiles', bedW: 1.8, keepDoor1: true,
+      tvCab: { len: 1.6, depth: 0.42, h: 0.5 }, // kệ TV cũ (ước theo ảnh, anh đo lại giúp)
       wardrobe: { len: 1.6, h: 2.0, depth: 0.5 }, deskW: 1.0,
       drop: ['rug', 'sofa', 'table', 'rug2', 'plant', 'plant2', 'shoe', 'hooks', 'mirror']
     },
@@ -114,7 +115,7 @@
     // --- Phương án mới ---
     // Giường nằm gọn trên mảng tường giữa cửa 1 và cửa 2, chân giường nhìn vào TV.
     var tvC = (d1.to + d2.from) / 2;
-    var bed = { x0: W - (full ? 2.08 : 2.06), x1: W, z0: tvC - V.bedW / 2, z1: tvC + V.bedW / 2 };
+    var bed = { x0: W - 2.08, x1: W, z0: tvC - V.bedW / 2, z1: tvC + V.bedW / 2 };
     // Nửa bếp cũ — phương án "góc nắng cô dâu" (chấm điểm cao nhất trong 3 phương án):
     // tủ áo tường C, bàn trang điểm phủ trọn cửa sổ góc A–K, ghế văng có hộc ở góc C–K,
     // gương treo tường A cạnh bàn, lối từ giường ra cửa 3 để trống hoàn toàn.
@@ -150,7 +151,7 @@
     if (!full) {
       moi = moi.filter(function (it) { return V.drop.indexOf(it.id) < 0; });
       moi.forEach(function (it) {
-        if (it.id === 'bed') it.name = 'Giường cũ 1m6, đầu giường gỗ (dùng lại), canh giữa mảng tường giữa cửa 1 và cửa 2';
+        if (it.id === 'bed') it.name = 'Giường mới 1m8 × 2m, canh giữa mảng tường giữa cửa 1 và cửa 2';
         if (it.id === 'ns1') it.name = 'Kệ gỗ treo nhỏ hai bên đầu giường (vài trăm nghìn), gầm để loa sub';
         if (it.id === 'feat') { it.name = 'Mảng sơn màu tối sau đầu giường (thay vách lam)'; it.paint = true; }
         if (it.id === 'wr') {
@@ -163,6 +164,11 @@
           it.x0 = sinkC - V.deskW / 2; it.x1 = sinkC + V.deskW / 2;
         }
       });
+      // Kệ TV cũ dùng lại làm tủ thấp để đồ, kê nối tiếp sau tủ quần áo ở tường đầu giường
+      var wrTk = moi.filter(function (it) { return it.id === 'wr'; })[0];
+      var cz0 = wrTk.z1 + 0.1, cz1 = Math.min(cz0 + V.tvCab.len, L - 0.05);
+      moi.splice(moi.indexOf(wrTk) + 1, 0, { id: 'ketv', n: 6.5, name: 'Kệ TV cũ làm tủ thấp để đồ: ngăn kéo để đồ gấp, mặt kính bày ảnh cưới',
+        x0: W - V.tvCab.depth - 0.03, x1: W - 0.03, z0: cz0, z1: cz1, h: V.tvCab.h, kind: 'wood' });
     }
     // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
     moi = moi.filter(function (it) { return it.id !== 'hooks' || it.z1 - it.z0 >= 0.2; });
@@ -905,7 +911,7 @@
       // --- Giường ---
       var b = lay.bed;
       var bx0 = b.x0, bx1 = b.x1 - 0.1, bz0 = b.z0, bz1 = b.z1, bcx = (bx0 + bx1) / 2, bcz = (bz0 + bz1) / 2;
-      var frameMat = lay.full ? mats.head : mats.doorWood; // giường cũ: khung và đầu giường gỗ
+      var frameMat = lay.full ? mats.head : mats.wood; // bản tiết kiệm: giường mới anh đã có, vẽ khung gỗ trơn
       box(R, frameMat, b.x1 - 0.1, b.x1 - 0.06, 0.1, lay.full ? 1.2 : 1.0, bz0 - (lay.full ? 0.1 : 0.03), bz1 + (lay.full ? 0.1 : 0.03)); // tấm đầu giường
       if (lay.full) {
         for (var hz = bz0; hz <= bz1 + 0.001; hz += (bz1 - bz0 + 0.2) / 6) {
@@ -944,7 +950,7 @@
       R.add(hy);
 
       // --- Tab đầu giường + đèn thả ---
-      // Loa sub của bộ loa cũ: đặt dưới gầm tab treo phía tường cửa sổ nhỏ (kệ TV cũ không mang vào phòng)
+      // Loa sub của bộ loa cũ: đặt dưới gầm tab/kệ treo phía tường cửa sổ nhỏ
       var n1 = get('ns1');
       box(R, mats.black, W - 0.4, W - 0.06, 0, 0.36, (n1.z0 + n1.z1) / 2 - 0.13, (n1.z0 + n1.z1) / 2 + 0.13);
 
@@ -1007,6 +1013,19 @@
       }
       var toe = box(R, mats.led, w.x0 + 0.03, w.x0 + 0.05, 0.05, 0.06, w.z0, w.z1, { shadow: false }); // LED hắt chân tủ
       toe.userData.led = true;
+      }
+
+      // --- Kệ TV cũ làm tủ thấp để đồ (bản tiết kiệm): khung đen mặt kính + khối 2 ngăn kéo nâu ---
+      var kc = get('ketv');
+      if (kc) {
+        var kd = Math.min(0.45, (kc.z1 - kc.z0) / 3);
+        box(R, mats.black, kc.x0, kc.x1, 0.08, kc.h - 0.02, kc.z0, kc.z1 - kd);
+        box(R, mats.screen, kc.x0, kc.x1, kc.h - 0.02, kc.h, kc.z0, kc.z1 - kd); // mặt kính đen
+        box(R, mats.black, kc.x0 + 0.03, kc.x1 - 0.03, 0.22, 0.24, kc.z0 + 0.02, kc.z1 - kd - 0.02); // tầng giữa
+        box(R, mats.doorWood, kc.x0, kc.x1, 0.08, kc.h, kc.z1 - kd, kc.z1);
+        box(R, mats.black, kc.x0 - 0.003, kc.x0, 0.29, 0.3, kc.z1 - kd + 0.03, kc.z1 - 0.03, { shadow: false }); // khe ngăn kéo
+        [kc.z0 + 0.05, kc.z1 - 0.05].forEach(function (lz) { cyl(R, mats.metal, 0.015, 0.08, (kc.x0 + kc.x1) / 2, 0, lz, 8); });
+        box(R, mats.accent, kc.x0 + 0.1, kc.x0 + 0.3, kc.h, kc.h + 0.22, kc.z0 + 0.3, kc.z0 + 0.32); // khung ảnh cưới
       }
 
       // --- Gương toàn thân ---

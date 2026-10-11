@@ -42,13 +42,14 @@ describe("mặt bằng", () => {
     const { page, errors, close } = await open();
     try {
       assert.match(await planLabel(page), /sau cải tạo, bản tiết kiệm/);
-      assert.equal(await legendCount(page), 7);
+      assert.equal(await legendCount(page), 8);
+      assert.match(await page.textContent("#planLegend"), /Kệ TV cũ làm tủ thấp/);
       await page.click('[data-plan-tab="cu"]');
       assert.match(await planLabel(page), /hiện trạng/);
       assert.equal(await legendCount(page), 8);
       assert.equal(await page.getAttribute('[data-plan-tab="cu"]', "aria-pressed"), "true");
       await page.click('[data-plan-tab="moi"]');
-      assert.equal(await legendCount(page), 7);
+      assert.equal(await legendCount(page), 8);
       assert.deepEqual(errors, []);
     } finally { await close(); }
   });
@@ -65,7 +66,7 @@ describe("mặt bằng", () => {
       await page.reload();
       assert.match(await planLabel(page), /bản đầy đủ/);
       await page.locator('.plan [data-variant="tk"]').click();
-      assert.equal(await legendCount(page), 7);
+      assert.equal(await legendCount(page), 8);
       assert.equal(await page.textContent("#costTotal"), "18–33 triệu");
       assert.deepEqual(errors, []);
     } finally { await close(); }
