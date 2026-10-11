@@ -276,7 +276,7 @@
         a = Y(o.to); b = Y(o.from);
         g.appendChild(el('rect', { x: xw - T * S / 2 - 1, y: a, width: T * S + 2, height: b - a, class: 'pl-gap' }));
         g.appendChild(el('line', { x1: xw, y1: a, x2: xw, y2: b, class: 'pl-glass' }));
-        if (o.bottom > 2) g.setAttribute('class', g.getAttribute('class') + ' pl-open--high');
+        if (o.bottom >= 1.8) g.setAttribute('class', g.getAttribute('class') + ' pl-open--high');
       }
       svg.appendChild(g);
     });

@@ -237,3 +237,11 @@
 .glare__more h4 { font-size: 1rem; margin: 0 0 var(--s-2); }
 .glare__more p { margin: 0; font-size: .92rem; color: var(--ink-2); }
 @media (max-width: 640px) { .glare__table th[scope="row"] { white-space: normal; } }
+
+/* Ký hiệu mặt bằng */
+.plan__key { list-style: none; margin: 0; padding: var(--s-3) var(--s-5); display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: .84rem; color: var(--ink-2); border-bottom: 1px solid var(--divider); }
+.plan__key li { display: flex; align-items: center; gap: 8px; }
+.key { display: inline-block; width: 28px; height: 0; border-top: 4px solid #5aa3c4; }
+.key--high { border-top-style: dashed; }
+.key--door { width: 18px; height: 18px; border: 0; border-left: 3px solid var(--ink); border-top: 1.5px dashed var(--ink-3); border-top-right-radius: 18px; }
+.key--old { border-top: 2.5px dashed var(--rose); }
