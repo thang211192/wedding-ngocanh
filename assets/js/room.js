@@ -97,11 +97,11 @@
     // Ba cửa cùng nằm trên tường phía sân, đều 80 × 190 cm, có ô kính phía trên.
     // Đánh số 1 → 3 từ tường cửa sổ nhỏ sang tường bếp cũ (theo số đo đã gửi):
     //   cửa 1 cách tường cửa sổ nhỏ 55 cm · mảng tường dưới điều hoà 160 cm ·
-    //   cửa 2 hai cánh · cửa 3 cách tường bếp cũ 220 cm, là lối ra nhà tắm.
+    //   cửa 2 hai cánh · cửa 3 cách tường bếp cũ 160 cm, là lối ra nhà tắm.
     var d1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0, top: 1.9, head: 2.3, kind: 'door', label: 'Cửa 1' };
     var d2 = { wall: 'A', from: 2.95, to: 3.75, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', label: 'Cửa 2' };
     // Cửa 3 là cửa đôi mở ra ngoài, nên trong phòng không có vùng quét cánh.
-    var d3 = { wall: 'A', from: L - 3.0, to: L - 2.2, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', outward: true, label: 'Cửa 3 · ra nhà tắm' };
+    var d3 = { wall: 'A', from: L - 2.4, to: L - 1.6, bottom: 0, top: 1.9, head: 2.3, kind: 'door2', outward: true, label: 'Cửa 3 · ra nhà tắm' };
     // Phương án mới: xây bậu nửa dưới cửa 1, thành cửa sổ (giữ ánh sáng, bớt một lối ra ngoài).
     var w1 = { wall: 'A', from: 0.55, to: 1.35, bottom: 0.9, top: 2.3, kind: 'window', label: 'Cửa 1 → cửa sổ' };
     var winB = { wall: 'B', from: W / 2 - 0.4, to: W / 2 + 0.4, bottom: 1.9, top: 2.5, kind: 'window' };
@@ -124,6 +124,10 @@
     var desk = { x0: winK.from - 0.15, x1: winK.to + 0.13, z0: L - 0.45, z1: L };
     var sofa = { x0: Math.max(desk.x1 + 0.06, W - 1.34), x1: W - 0.04, z0: L - 0.75, z1: L };
     var featZ0 = Math.max(0.05, bed.z0 - 0.65), featZ1 = Math.min(P - 0.05, bed.z1 + 0.65);
+    // Tủ giày (bản đầy đủ): ưu tiên đoạn tường giữa vách cũ và cửa 3, chừa 40 cm cho móc khăn sát cửa;
+    // không đủ chỗ thì chuyển sang sau cửa 3, dừng trước gương.
+    var shoeN = { z0: P + 0.15, z1: Math.min(P + 1.05, d3.from - 0.55) };
+    var shoe = shoeN.z1 - shoeN.z0 >= 0.4 ? shoeN : { z0: Math.max(d3.to + 0.1, P + 0.1), z1: Math.min(d3.to + 1.0, L - 1.15) };
 
     var moi = [
       { id: 'bed', n: 1, name: 'Giường 1m8 × 2m, đầu bọc vải chống mèo cào, canh giữa mảng tường giữa cửa 1 và cửa 2', x0: bed.x0, x1: bed.x1, z0: bed.z0, z1: bed.z1, kind: 'bed' },
@@ -143,8 +147,8 @@
       { id: 'plant2', n: 10, name: '', x0: 0.03, x1: 0.35, z0: L - 0.4, z1: L - 0.05, kind: 'plant' },
       // Trụ cào cho mèo: cạnh giường, ngay đầu vách lam, chỗ mèo ngủ dậy là cào
       { id: 'scratch', n: 12, name: 'Trụ cào sisal cho mèo, cao 90 cm', x0: W - 0.43, x1: W - 0.03, z0: Math.max(P - 0.42, bed.z1 + 0.53), z1: Math.max(P - 0.42, bed.z1 + 0.53) + 0.4, kind: 'stool' },
-      { id: 'shoe', n: 11, name: 'Tủ giày + móc khăn sát cửa 3 (lối ra nhà tắm)', x0: 0, x1: 0.32, z0: Math.max(d3.to + 0.1, P + 0.1), z1: Math.min(Math.max(d3.to + 1.0, P + 1.0), L - 1.15), kind: 'wood' }, // dừng trước gương
-      { id: 'hooks', n: 11, name: '', x0: 0, x1: 0.06, z0: Math.max(P + 0.1, d2.to + 0.05, d3.from - 0.45), z1: d3.from - 0.05, kind: 'hooks' }
+      { id: 'shoe', n: 11, name: 'Tủ giày + móc khăn sát cửa 3 (lối ra nhà tắm)', x0: 0, x1: 0.32, z0: shoe.z0, z1: shoe.z1, kind: 'wood' },
+      { id: 'hooks', n: 11, name: '', x0: 0, x1: 0.06, z0: Math.max(P + 0.1, d2.to + 0.05, d3.from - 0.45, shoe.z1 < d3.from ? shoe.z1 + 0.1 : 0), z1: d3.from - 0.05, kind: 'hooks' }
     ];
 
     // Bản tiết kiệm: bỏ đồ không bắt buộc, đổi sang đồ mua sẵn / dùng lại
@@ -171,7 +175,7 @@
         x0: W - V.tvCab.depth - 0.03, x1: W - 0.03, z0: cz0, z1: cz1, h: V.tvCab.h, kind: 'wood' });
     }
     // Móc khăn chỉ có khi còn đủ ≥ 20 cm tường giữa vách cũ và cửa 3
-    moi = moi.filter(function (it) { return it.id !== 'hooks' || it.z1 - it.z0 >= 0.2; });
+    moi = moi.filter(function (it) { return (it.id !== 'hooks' || it.z1 - it.z0 >= 0.2) && (it.id !== 'shoe' || it.z1 - it.z0 >= 0.3); });
     // Trụ cào chỉ vẽ khi lọt giữa tab đầu giường và vách cũ (tủ áo bắt đầu ngay sau vách)
     moi = moi.filter(function (it) { return it.id !== 'scratch' || it.z1 <= P + 0.05; });
     // Đánh lại số chú thích cho liền mạch sau khi đã bỏ bớt món
