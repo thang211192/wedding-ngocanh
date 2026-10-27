@@ -75,9 +75,17 @@ test('liên kết mở được thiệp riêng ở trình duyệt khác; tải �
     await page.waitForFunction(() => document.querySelector('#previewStatus').textContent.includes('Đã sao chép'));
     const url = await page.evaluate(() => navigator.clipboard.readText());
     const guest = await recipient.newPage();
+    await guest.setViewportSize({ width: 390, height: 844 });
     await guest.goto(url);
     assert.equal(await guest.locator('#guestView').isVisible(), true);
     assert.equal(await guest.locator('#studio').isVisible(), false);
+    assert.equal(await guest.locator('#guestCover').isVisible(), true);
+    assert.equal(await guest.locator('#guestReveal').isVisible(), false);
+    assert.match(await guest.locator('#coverGuest').textContent(), /Minh và gia đình/);
+    await guest.locator('#openGuestInvite').click();
+    assert.equal(await guest.locator('#guestCover').isVisible(), false);
+    assert.equal(await guest.locator('#guestReveal').isVisible(), true);
+    assert.equal(await guest.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     assert.match(await guest.locator('#guestText').textContent(), /Minh và gia đình/);
     assert.match(await guest.locator('#guestMap').getAttribute('href'), /^https:\/\/www.google.com\/maps\/search/);
     const download = await Promise.all([page.waitForEvent('download'), page.locator('#downloadInvite').click()]).then(x => x[0]);
@@ -101,5 +109,20 @@ test('liên kết lỗi, nội dung HTML và trình duyệt chặn lưu không l
     assert.match(await page.locator('#saveStatus').textContent(), /chưa cho lưu/);
     assert.equal(await page.locator('img[src=x]').count(), 0);
     assert.deepEqual(errors, []);
+  } finally { await ctx.close(); }
+});
+
+test('font viết tay có tiếng Việt và sáu nền minh họa tải đủ trước khi xuất thiệp', async () => {
+  const { ctx, page } = await open();
+  try {
+    assert.equal(await page.evaluate(() => document.fonts.check('400 40px "Great Vibes"', 'Văn Thắng Ngọc Anh')), true);
+    const assets = await page.evaluate(() => performance.getEntriesByType('resource').filter(x => /images\/invitations\/.*-v2.webp/.test(x.name)).map(x => x.name));
+    assert.equal(new Set(assets).size, 6);
+    await page.locator('.template-visual').nth(4).click();
+    const popupPromise = page.waitForEvent('popup');
+    await page.locator('#previewGuest').click();
+    const recipient = await popupPromise;
+    await recipient.waitForLoadState();
+    assert.equal(await recipient.locator('#guestCover').isVisible(), true);
   } finally { await ctx.close(); }
 });
