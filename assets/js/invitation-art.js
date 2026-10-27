@@ -21,12 +21,19 @@
     {name:'Lời thương màu đào',label:'Vườn hồng · Thẻ trái tim',art:'rose',layout:'heart',ink:'#794955',accent:'#bd8c84',color:'#9c6570',script:true,description:'Một thẻ thiệp với trái tim nét lụa giữa vườn hồng và mẫu đơn. Tên hai bạn là trung tâm của bố cục.'},
     {name:'Dấu ấn xanh rêu',label:'Phong thư xanh · Mộc lan',art:'magnolia',layout:'envelope',ink:'#41513d',accent:'#b7a573',color:'#4b6048',script:true,description:'Phong bì xanh rêu, thẻ mộc lan trắng và dấu sáp vàng. Gọn gàng ở phần chữ, phong phú ở hoa và chất liệu giấy.'}
   ];
+  specs.push(...window.InvitationAdditions);
+  const legacy = [
+    ['vom-anh-kim','formal'],['do-ruou','formal'],['navy','formal'],['xanh-ngoc','formal'],
+    ['trang-den','minimal'],['cat-vang','minimal'],['hong-phan','romantic'],['o-liu','romantic'],
+    ['trang-ngoc','formal'],['tim-khoi','romantic'],['dat-nung','minimal'],['den-vang','formal'],
+    ['xanh-suong','minimal'],['hoa-moc','romantic'],['hong-dao','romantic'],['xanh-reu','minimal']
+  ];
   let loading;
   function load() {
-    if (!loading) loading=Promise.all(['lotus','magnolia','rose','baroque','phoenix','toile'].map(key=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>reject(Error('Không tải được họa tiết '+key));img.src=new URL(key+'-v2.webp',root).href;})));
+    if (!loading) loading=Promise.all([...new Set(specs.map(t=>t.art))].map(key=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>reject(Error('Không tải được họa tiết '+key));img.src=new URL(key+'-v2.webp',root).href;})));
     return loading;
   }
-  function decorate(templates){templates.forEach((t,i)=>Object.assign(t,specs[i]));}
+  function getTemplates(){return specs.map((t,i)=>({...t,id:t.id||legacy[i][0],category:t.category||legacy[i][1],isNew:i>=legacy.length}));}
   const SERIF='"Playfair Display"',SCRIPT='"Great Vibes"',SANS='"Be Vietnam Pro"';
   function text(c,value,x,y,size=18,{family=SANS,color,max=430,weight=400,align='center'}={}){
     if(color)c.fillStyle=color;c.textAlign=align;c.textBaseline='alphabetic';c.font=`${weight} ${size}px ${family}`;
@@ -80,6 +87,27 @@
   function draw(canvas,t,d,width=600){
     canvas.width=width;canvas.height=width*4/3;const c=canvas.getContext('2d');c.scale(width/600,width/600);c.fillStyle='#f8f0e3';c.fillRect(0,0,600,800);art(c,t.art);grain(c,t.color);
     if(t.layout==='envelope'){envelope(c,t,d);return canvas;}
+    if(t.layout==='scallop'){
+      const shape=(inset=0)=>{c.beginPath();c.moveTo(157,109+inset);c.lineTo(443,109+inset);c.quadraticCurveTo(443,157,490-inset,157);c.lineTo(490-inset,643);c.quadraticCurveTo(443,643,443,691-inset);c.lineTo(157,691-inset);c.quadraticCurveTo(157,643,110+inset,643);c.lineTo(110+inset,157);c.quadraticCurveTo(157,157,157,109+inset);c.closePath();};
+      c.save();c.shadowColor='#47362738';c.shadowBlur=16;c.shadowOffsetY=5;c.fillStyle='#fffaf1f5';shape();c.fill();c.restore();c.strokeStyle=t.accent;shape(11);c.stroke();title(c,t,211);names(c,t,d,291,{gap:81,size:61,width:319});flourish(c,422,t.accent);dateBlock(c,t,d,486,{compact:true});details(c,t,d,573,{width:299});return canvas;
+    }
+    if(t.layout==='gatefold'){
+      c.save();c.shadowColor='#38291e44';c.shadowBlur=17;c.shadowOffsetY=5;c.fillStyle='#fffaf0';round(c,111,83,378,634,3);c.fill();c.restore();c.strokeStyle=t.accent;c.strokeRect(124,96,352,608);
+      for(const side of[-1,1]){c.save();c.translate(side<0?70:530,0);c.transform(1,side*.27,0,1,0,0);c.fillStyle=t.color;c.fillRect(-35,148,70,515);c.strokeStyle=t.accent;c.strokeRect(-28,155,56,500);c.strokeStyle='#fff5d766';line(c,0,183,0,628);c.restore();}
+      foil(c,300,139,25,d,t.accent);title(c,t,211);names(c,t,d,293,{gap:84,size:61,width:320});flourish(c,423,t.accent);dateBlock(c,t,d,486,{compact:true});details(c,t,d,574,{width:300});return canvas;
+    }
+    if(t.layout==='medallion'){
+      c.save();c.shadowColor='#392d2230';c.shadowBlur=18;c.fillStyle='#fffaf0f0';round(c,99,75,402,650,15);c.fill();c.restore();c.strokeStyle=t.accent;round(c,112,88,376,624,9);c.stroke();foil(c,300,163,44,d,t.accent);title(c,t,244);names(c,t,d,323,{gap:78,size:63,width:330});flourish(c,447,t.accent);dateBlock(c,t,d,502,{compact:true});details(c,t,d,591,{width:315});return canvas;
+    }
+    if(t.layout==='cathedral'){
+      const shape=(n=0)=>{c.beginPath();c.moveTo(102+n,718-n);c.lineTo(102+n,306);c.bezierCurveTo(102+n,191,215,144,300,75+n);c.bezierCurveTo(385,144,498-n,191,498-n,306);c.lineTo(498-n,718-n);c.closePath();};
+      c.save();c.shadowColor='#3b362133';c.shadowBlur=18;c.fillStyle='#fffaf1f2';shape();c.fill();c.restore();c.strokeStyle=t.accent;shape(12);c.stroke();flourish(c,172,t.accent);title(c,t,227);names(c,t,d,307,{gap:84,size:61,width:326});flourish(c,436,t.accent);dateBlock(c,t,d,500,{compact:true});details(c,t,d,588,{width:305});return canvas;
+    }
+    if(t.layout==='ticket'){
+      c.save();c.shadowColor='#47362733';c.shadowBlur=18;c.shadowOffsetY=5;c.fillStyle='#fffaf1f5';round(c,83,104,434,599,7);c.fill();c.restore();c.strokeStyle=t.accent;round(c,96,117,408,573,3);c.stroke();
+      c.save();c.setLineDash([3,6]);line(c,100,547,500,547);c.restore();c.fillStyle='#e6d8c1';for(const x of[83,517]){c.beginPath();c.arc(x,547,13,0,Math.PI*2);c.fill();}
+      title(c,t,180,'UN JOUR À DEUX · MỘT NGÀY CHUNG ĐÔI');names(c,t,d,277,{gap:83,size:65,width:363});flourish(c,409,t.accent);dateBlock(c,t,d,465,{compact:true});details(c,t,d,585,{width:340});return canvas;
+    }
     if(t.layout==='split'){
       const g=c.createLinearGradient(0,0,600,320);g.addColorStop(0,t.color);g.addColorStop(1,'#152f28');c.fillStyle=g;c.beginPath();c.moveTo(0,0);c.lineTo(600,0);c.lineTo(600,330);c.bezierCurveTo(420,310,350,430,300,430);c.bezierCurveTo(250,430,180,310,0,330);c.closePath();c.fill();const top={...t,ink:'#fff5dc',accent:'#c5ad7d'};title(c,top,89,'CÙNG VIẾT TIẾP MỘT CHUYỆN TÌNH');names(c,top,d,177,{gap:87,size:65,width:410});flourish(c,316,top.accent);dateBlock(c,t,d,488);details(c,t,d,589,{width:310});return canvas;
     }
@@ -93,7 +121,7 @@
       c.save();c.shadowColor='#44302930';c.shadowBlur=15;c.shadowOffsetY=7;c.fillStyle='#fffbf3';round(c,112,111,376,566,[100,100,3,3]);c.fill();c.restore();c.strokeStyle=t.accent;round(c,125,125,350,538,[90,90,2,2]);c.stroke();ribbon(c,t);title(c,t,230);names(c,t,d,302,{gap:72,size:57,width:315});flourish(c,410,t.accent);dateBlock(c,t,d,461,{compact:true});details(c,t,d,d.guest?554:560,{width:300});return canvas;
     }
     if(t.layout==='collage'){
-      c.save();c.translate(300,185);c.rotate(-.11);c.shadowColor='#36251a40';c.shadowBlur=15;c.fillStyle='#fffcf5';c.fillRect(-193,-143,386,260);art(c,'lotus',{x:-182,y:-132,w:364,h:230});c.restore();
+      c.save();c.translate(300,185);c.rotate(-.11);c.shadowColor='#36251a40';c.shadowBlur=15;c.fillStyle='#fffcf5';c.fillRect(-193,-143,386,260);art(c,t.art,{x:-182,y:-132,w:364,h:230});c.restore();
       c.save();c.shadowColor='#32261930';c.shadowBlur=16;c.fillStyle='#fffaf0';round(c,103,227,394,478,4);c.fill();c.restore();foil(c,430,248,31,d,t.accent);title(c,t,290);names(c,t,d,366,{gap:74,size:58,width:335});dateBlock(c,t,d,509,{compact:true});details(c,t,d,597,{width:310});return canvas;
     }
     if(t.layout==='garden'){
@@ -114,5 +142,5 @@
     text(c,d.guest||'CHUNG VUI CÙNG HAI GIA ĐÌNH',300,royal?471:487,d.guest?17:9,{color:t.ink,max:330});dateBlock(c,t,d,royal?535:551);details(c,t,d,royal?630:647,{width:325,guest:false});
     return canvas;
   }
-  window.InvitationArt={load,decorate,draw};
+  window.InvitationArt={load,getTemplates,draw};
 })();

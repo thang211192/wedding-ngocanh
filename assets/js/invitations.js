@@ -1,25 +1,7 @@
 (() => {
   'use strict';
-  const templates = [
-    { id: 'vom-anh-kim', name: 'Vòm ánh kim', category: 'formal', label: 'Kem ngà · Ánh kim', bg: '#fcf7ed', ink: '#51412e', accent: '#a68b53', mode: 'arch', description: 'Vòm thanh mảnh trên nền kem ngà, điểm ánh vàng nhẹ. Một lời mời trang trọng và ấm áp.' },
-    { id: 'do-ruou', name: 'Lời hẹn đỏ rượu', category: 'formal', label: 'Đỏ rượu · Vàng champagne', bg: '#562831', ink: '#f9efdf', accent: '#c3a36d', mode: 'seal', description: 'Sắc đỏ rượu sâu, khung đôi và dấu ấn tên hai bạn. Hợp với một buổi lễ trang nghiêm.' },
-    { id: 'navy', name: 'Đêm xanh navy', category: 'formal', label: 'Navy · Ánh vàng', bg: '#182c3d', ink: '#f7f0e1', accent: '#c2a575', mode: 'stars', description: 'Xanh navy và những điểm sao nhỏ, gọn gàng như một lời hẹn trong buổi tối thanh lịch.' },
-    { id: 'xanh-ngoc', name: 'Ngọc lục bảo', category: 'formal', label: 'Xanh ngọc · Vàng nhạt', bg: '#203e37', ink: '#fbf3df', accent: '#bfa671', mode: 'diamond', description: 'Xanh ngọc trầm với nét hình học ánh vàng, trang trọng và có chiều sâu.' },
-    { id: 'trang-den', name: 'Chung đôi', category: 'minimal', label: 'Trắng ấm · Đen mực', bg: '#faf9f5', ink: '#282825', accent: '#8a8276', mode: 'editorial', description: 'Bố cục chữ lớn, khoảng trắng rộng và một đường kẻ mảnh. Dành cho người thích sự giản dị.' },
-    { id: 'cat-vang', name: 'Miền cát ấm', category: 'minimal', label: 'Cát be · Nâu đất', bg: '#e9dfce', ink: '#5c4635', accent: '#9c7d5c', mode: 'sun', description: 'Sắc cát dịu và những vòng cung đồng tâm. Hiện đại, mềm mại và dễ gần.' },
-    { id: 'hong-phan', name: 'Hồng phấn', category: 'romantic', label: 'Hồng phấn · Nâu hồng', bg: '#f4e5e1', ink: '#6c4149', accent: '#b48689', mode: 'floral', description: 'Những cành hoa nét mảnh trên nền hồng nhạt, lãng mạn nhưng vẫn giữ sự tinh tế.' },
-    { id: 'o-liu', name: 'Vườn ô liu', category: 'romantic', label: 'Trắng kem · Xanh ô liu', bg: '#f4f3e9', ink: '#46503d', accent: '#8b9577', mode: 'botanical', description: 'Lá xanh ô liu ôm lấy lời mời, mang cảm giác tự nhiên và yên bình.' },
-    { id: 'trang-ngoc', name: 'Trắng ngọc trai', category: 'formal', label: 'Trắng ngọc · Xám bạc', bg: '#f7f7f3', ink: '#535762', accent: '#9fa4ae', mode: 'oval', description: 'Khung oval và các chấm nhỏ như ngọc trai. Nhẹ nhàng, lịch thiệp, không quá cầu kỳ.' },
-    { id: 'tim-khoi', name: 'Tím khói', category: 'romantic', label: 'Tím khói · Kem nhạt', bg: '#e8e2ed', ink: '#5b4967', accent: '#9b85a9', mode: 'ribbon', description: 'Một dải nơ nét mảnh và sắc tím khói, dành cho lời mời dịu dàng và riêng tư.' },
-    { id: 'dat-nung', name: 'Nắng đất nung', category: 'minimal', label: 'Đất nung · Kem ấm', bg: '#a85743', ink: '#fff2df', accent: '#e3ba93', mode: 'blocks', description: 'Các mảng hình học trong bảng màu đất nung. Một lựa chọn hiện đại và nổi bật.' },
-    { id: 'den-vang', name: 'Dạ tiệc ánh vàng', category: 'formal', label: 'Đen than · Vàng cổ', bg: '#282725', ink: '#f4ead5', accent: '#b49b67', mode: 'deco', description: 'Khung Art Deco cân xứng, đen than và vàng cổ. Hợp với phong cách dạ tiệc trang trọng.' },
-    { id: 'xanh-suong', name: 'Xanh sương mai', category: 'minimal', label: 'Xanh sương · Xanh mực', bg: '#e3ebee', ink: '#365260', accent: '#8ca4ad', mode: 'horizon', description: 'Những đường chân trời mỏng và màu xanh sương, thoáng nhẹ và gọn gàng.' },
-    { id: 'hoa-moc', name: 'Hoa mộc', category: 'romantic', label: 'Kem ấm · Nâu đồng', bg: '#f2e9db', ink: '#6c4b38', accent: '#ac8564', mode: 'wreath', description: 'Vòng cành lá mảnh trên nền giấy ấm, như một lời mời chân thành được viết riêng.' },
-    { id: 'hong-dao', name: 'Lời thương màu đào', category: 'romantic', label: 'Hồng đào · Đỏ đất', bg: '#f8e4d5', ink: '#874d43', accent: '#c48d72', mode: 'heart', description: 'Một trái tim vẽ bằng nét đơn và gam đào ấm. Lãng mạn, sáng và thân tình.' },
-    { id: 'xanh-reu', name: 'Dấu ấn xanh rêu', category: 'minimal', label: 'Xanh rêu · Trắng ngà', bg: '#4e594c', ink: '#f4f0e4', accent: '#b4bea7', mode: 'monogram', description: 'Tên viết tắt nổi bật, bố cục thoáng và màu xanh rêu. Tối giản mà vẫn có dấu ấn riêng.' }
-  ];
-  window.InvitationArt.decorate(templates);
-  const labels = { formal: 'Trang trọng', minimal: 'Phong bì & lụa', romantic: 'Hoa màu nước' };
+  const templates = window.InvitationArt.getTemplates();
+  const labels = { formal: 'Trang trọng', minimal: 'Thẻ & phong bì', romantic: 'Hoa màu nước' };
   const defaults = { groom: 'Văn Thắng', bride: 'Ngọc Anh', date: '', time: '', venue: '', address: '', guest: '', tone: 'formal', note: '' };
   const limits = { groom: 45, bride: 45, venue: 100, address: 180, guest: 70, note: 250 };
   const storageKey = 'wnc:invitation-studio-v1';
@@ -63,12 +45,29 @@
     await document.fonts.ready;fontsReady=true;
   }
   function notify(value){$('toast').textContent=value;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3500);}
-  function renderAll(){if(!fontsReady)return;draw($('heroCanvas'),templates[0],data);draw($('heroSideCanvas'),templates[1],data);draw($('heroBackCanvas'),templates[2],data);document.querySelectorAll('.template canvas').forEach(canvas=>draw(canvas,templates.find(t=>t.id===canvas.dataset.template),data));if($('previewDialog').open)renderPreview();}
-  function renderPreview(){draw($('previewCanvas'),selected,data,900);$('previewCanvas').setAttribute('aria-label',`Thiệp ${selected.name}: ${data.groom} và ${data.bride}, ${dateText(data,true)}, ${data.venue||'chưa có địa điểm'}`);$('previewTitle').textContent=`MẪU ${String(templates.indexOf(selected)+1).padStart(2,'0')} / 16`;$('previewCategory').textContent=labels[selected.category]+' · '+selected.label;$('previewName').textContent=selected.name;$('previewDescription').textContent=selected.description;$('messageText').value=message(data);const fields=missing(data);$('completion').textContent=fields.length?'Cần điền trước khi gửi: '+fields.join(', ')+'.':'';$('previewStatus').textContent='';document.querySelector('.manual-copy')?.remove();}
+  function renderAll(){if(!fontsReady)return;draw($('heroCanvas'),templates[0],data);draw($('heroSideCanvas'),templates[1],data);draw($('heroBackCanvas'),templates[2],data);document.querySelectorAll('.template canvas').forEach(canvas=>draw(canvas,templates.find(t=>t.id===canvas.dataset.template),data,450));if($('previewDialog').open)renderPreview();}
+  function renderPreview(){draw($('previewCanvas'),selected,data,900);$('previewCanvas').setAttribute('aria-label',`Thiệp ${selected.name}: ${data.groom} và ${data.bride}, ${dateText(data,true)}, ${data.venue||'chưa có địa điểm'}`);$('previewTitle').textContent=`MẪU ${String(templates.indexOf(selected)+1).padStart(2,'0')} / ${templates.length}`;$('previewCategory').textContent=labels[selected.category]+' · '+selected.label;$('previewName').textContent=selected.name;$('previewDescription').textContent=selected.description;$('messageText').value=message(data);const fields=missing(data);$('completion').textContent=fields.length?'Cần điền trước khi gửi: '+fields.join(', ')+'.':'';$('previewStatus').textContent='';document.querySelector('.manual-copy')?.remove();}
   function openPreview(t){clearTimeout(renderTimer);selected=t;renderAll();renderPreview();$('previewDialog').showModal();$('previewDialog').scrollTop=0;}
   function buildCollection(){
     const fragment=document.createDocumentFragment();
-    templates.forEach((t,i)=>{const article=document.createElement('article');article.className='template';article.dataset.category=t.category;const button=document.createElement('button');button.type='button';button.className='template-visual';button.setAttribute('aria-label',`Xem và chọn mẫu ${String(i+1).padStart(2,'0')} — ${t.name}`);const canvas=document.createElement('canvas');canvas.width=600;canvas.height=800;canvas.dataset.template=t.id;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`Mẫu ${t.name}, ${t.label}`);button.append(canvas);button.addEventListener('click',()=>openPreview(t));const meta=document.createElement('div');meta.className='template-meta';const words=document.createElement('div');const h=document.createElement('h3');h.textContent=t.name;const p=document.createElement('p');p.textContent=t.label;words.append(h,p);const number=document.createElement('span');number.className='template-number';number.textContent=String(i+1).padStart(2,'0');meta.append(words,number);const open=document.createElement('button');open.className='template-open';open.type='button';open.textContent='Xem & chọn mẫu ↗';open.setAttribute('aria-label','Xem và chọn '+t.name);open.addEventListener('click',()=>openPreview(t));article.append(button,meta,open);fragment.append(article);});$('templates').append(fragment);
+    templates.forEach((t,i)=>{const article=document.createElement('article');article.className='template';article.dataset.category=t.category;article.dataset.template=t.id;const button=document.createElement('button');button.type='button';button.className='template-visual';button.setAttribute('aria-label',`Xem và chọn mẫu ${String(i+1).padStart(2,'0')} — ${t.name}`);const canvas=document.createElement('canvas');canvas.width=450;canvas.height=600;canvas.dataset.template=t.id;canvas.setAttribute('role','img');canvas.setAttribute('aria-label',`Mẫu ${t.name}, ${t.label}`);button.append(canvas);if(t.isNew){const badge=document.createElement('span');badge.className='template-badge';badge.textContent='MỚI';button.append(badge);}button.addEventListener('click',()=>openPreview(t));const meta=document.createElement('div');meta.className='template-meta';const words=document.createElement('div');const h=document.createElement('h3');h.textContent=t.name;const p=document.createElement('p');p.textContent=t.label;words.append(h,p);const number=document.createElement('span');number.className='template-number';number.textContent=String(i+1).padStart(2,'0');meta.append(words,number);const open=document.createElement('button');open.className='template-open';open.type='button';open.textContent='Xem & chọn mẫu ↗';open.setAttribute('aria-label','Xem và chọn '+t.name);open.addEventListener('click',()=>openPreview(t));article.append(button,meta,open);fragment.append(article);});$('templates').append(fragment);
+  }
+  function normalizeSearch(value){return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();}
+  function applyFilters(){
+    const category=document.querySelector('[data-filter][aria-pressed="true"]').dataset.filter;
+    const query=normalizeSearch($('templateSearch').value.trim());
+    const theme=$('templateTheme').value;
+    let count=0;
+    document.querySelectorAll('.template').forEach(card=>{
+      const index=templates.findIndex(t=>t.id===card.dataset.template),t=templates[index];
+      const categoryMatch=category==='all'||(category==='new'?t.isNew:t.category===category);
+      const searchText=normalizeSearch([String(index+1).padStart(2,'0'),t.name,t.label,t.description,labels[t.category]].join(' '));
+      const queryMatch=!query||(/^\d{1,2}$/.test(query)?Number(query)===index+1:searchText.includes(query));
+      card.hidden=!(categoryMatch&&(theme==='all'||theme===t.art)&&queryMatch);
+      if(!card.hidden)count++;
+    });
+    $('collectionCount').textContent=count+' / '+templates.length+' mẫu thiệp';
+    $('templateEmpty').hidden=count!==0;
   }
   function readyToSend(status){const fields=missing(data);if(fields.length){status.textContent='Vui lòng điền '+fields.join(', ')+' trước khi gửi thiệp.';return false;}return true;}
   async function copy(value,status){
@@ -91,7 +90,12 @@
     if(!guest){try{data=clean(JSON.parse(localStorage.getItem(storageKey)));}catch{data={...defaults};}
       Object.keys(defaults).forEach(key=>$(key).value=data[key]);buildCollection();
       $('inviteForm').addEventListener('input',()=>{const raw=Object.fromEntries(new FormData($('inviteForm')));data=clean(raw);try{localStorage.setItem(storageKey,JSON.stringify(data));$('saveStatus').textContent='Đã lưu trên trình duyệt này.';}catch{$('saveStatus').textContent='Trình duyệt chưa cho lưu. Bạn vẫn có thể chọn mẫu và gửi thiệp trong phiên này.';}clearTimeout(renderTimer);renderTimer=setTimeout(renderAll,100);});
-      document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));let count=0;document.querySelectorAll('.template').forEach(card=>{card.hidden=button.dataset.filter!=='all'&&card.dataset.category!==button.dataset.filter;if(!card.hidden)count++;});$('collectionCount').textContent=`${count} mẫu thiệp`;}));
+      document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));applyFilters();}));
+      $('templateSearch').addEventListener('input',applyFilters);
+      $('templateTheme').addEventListener('change',applyFilters);
+      $('showNewTemplates').addEventListener('click',()=>{$('templateSearch').value='';$('templateTheme').value='all';document.querySelector('[data-filter="new"]').click();});
+      $('resetTemplateFilters').addEventListener('click',()=>{$('templateSearch').value='';$('templateTheme').value='all';document.querySelector('[data-filter="all"]').click();});
+      applyFilters();
       $('closePreview').addEventListener('click',()=>$('previewDialog').close());$('previewDialog').addEventListener('click',event=>{if(event.target!==$('previewDialog'))return;const rect=$('previewDialog').getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)$('previewDialog').close();});
       $('editDetails').addEventListener('click',()=>{$('previewDialog').close();$('thong-tin').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});$('groom').focus({preventScroll:true});});
       $('copyMessage').addEventListener('click',()=>{if(readyToSend($('previewStatus')))copy(message(data),$('previewStatus'));});$('downloadInvite').addEventListener('click',()=>download(selected,data,$('previewStatus')));$('previewGuest').addEventListener('click',()=>{const url=new URL(location.href);url.search='';url.hash='moi='+encodeURIComponent(JSON.stringify({template:selected.id,details:data}));window.open(url.href,'_blank','noopener');});

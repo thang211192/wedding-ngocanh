@@ -22,13 +22,14 @@ async function fill(page) {
   await page.locator('#address').fill('Địa chỉ thử nghiệm, Nam Định');
   await page.locator('#guest').fill('Minh và gia đình');
 }
-test('16 mẫu khác nhau; lọc, chọn mẫu và giao diện điện thoại hoạt động', async () => {
+test('40 mẫu khác nhau; lọc, chọn mẫu và giao diện điện thoại hoạt động', async () => {
   const { ctx, page } = await open();
   try {
-    assert.equal(await page.locator('.template').count(), 16);
+    assert.equal(await page.locator('.template').count(), 40);
     const images = await page.locator('.template canvas').evaluateAll(xs => xs.map(c => c.toDataURL()));
-    assert.equal(new Set(images).size, 16);
-    for (const [filter, count] of [['formal', 6], ['minimal', 5], ['romantic', 5], ['all', 16]]) {
+    assert.equal(new Set(images).size, 40);
+    assert.equal(await page.locator('.template-badge').count(), 24);
+    for (const [filter, count] of [['formal', 14], ['minimal', 13], ['romantic', 13], ['new', 24], ['all', 40]]) {
       await page.locator(`[data-filter="${filter}"]`).click();
       assert.equal(await page.locator('.template:visible').count(), count);
     }
@@ -70,7 +71,7 @@ test('liên kết mở được thiệp riêng ở trình duyệt khác; tải �
   const recipient = await browser.newContext();
   try {
     await fill(page);
-    await page.locator('.template-visual').nth(3).click();
+    await page.locator('.template-visual').nth(39).click();
     await page.locator('#copyInviteLink').click();
     await page.waitForFunction(() => document.querySelector('#previewStatus').textContent.includes('Đã sao chép'));
     const url = await page.evaluate(() => navigator.clipboard.readText());
@@ -89,7 +90,7 @@ test('liên kết mở được thiệp riêng ở trình duyệt khác; tải �
     assert.match(await guest.locator('#guestText').textContent(), /Minh và gia đình/);
     assert.match(await guest.locator('#guestMap').getAttribute('href'), /^https:\/\/www.google.com\/maps\/search/);
     const download = await Promise.all([page.waitForEvent('download'), page.locator('#downloadInvite').click()]).then(x => x[0]);
-    assert.equal(download.suggestedFilename(), 'thiep-cuoi-xanh-ngoc.png');
+    assert.equal(download.suggestedFilename(), 'thiep-cuoi-sakura-loi-uoc.png');
     const stream = await download.createReadStream();
     const chunks = []; for await (const chunk of stream) chunks.push(chunk);
     const bytes = Buffer.concat(chunks);
@@ -112,17 +113,44 @@ test('liên kết lỗi, nội dung HTML và trình duyệt chặn lưu không l
   } finally { await ctx.close(); }
 });
 
-test('font viết tay có tiếng Việt và sáu nền minh họa tải đủ trước khi xuất thiệp', async () => {
+test('font viết tay có tiếng Việt và 14 nền minh họa tải đủ trước khi xuất thiệp', async () => {
   const { ctx, page } = await open();
   try {
     assert.equal(await page.evaluate(() => document.fonts.check('400 40px "Great Vibes"', 'Văn Thắng Ngọc Anh')), true);
     const assets = await page.evaluate(() => performance.getEntriesByType('resource').filter(x => /images\/invitations\/.*-v2.webp/.test(x.name)).map(x => x.name));
-    assert.equal(new Set(assets).size, 6);
+    assert.equal(new Set(assets).size, 14);
     await page.locator('.template-visual').nth(4).click();
     const popupPromise = page.waitForEvent('popup');
     await page.locator('#previewGuest').click();
     const recipient = await popupPromise;
     await recipient.waitForLoadState();
     assert.equal(await recipient.locator('#guestCover').isVisible(), true);
+  } finally { await ctx.close(); }
+});
+
+test('tìm kiếm không dấu, theo số mẫu và kết hợp chủ đề không làm mất mẫu cũ', async () => {
+  const { ctx, page } = await open();
+  try {
+    await page.locator('#templateSearch').fill('tu dang');
+    assert.equal(await page.locator('.template:visible').count(), 3);
+    await page.locator('#templateSearch').fill('Tử đằng');
+    assert.equal(await page.locator('.template:visible').count(), 3);
+    await page.locator('#templateSearch').fill('40');
+    assert.equal(await page.locator('.template:visible').count(), 1);
+    assert.equal(await page.locator('.template:visible h3').textContent(), 'Sakura lời ước');
+    await page.locator('#templateSearch').fill('');
+    await page.selectOption('#templateTheme', 'orchid');
+    assert.equal(await page.locator('.template:visible').count(), 3);
+    await page.locator('[data-filter="formal"]').click();
+    assert.equal(await page.locator('.template:visible').count(), 1);
+    await page.locator('#templateSearch').fill('không có mẫu này');
+    assert.equal(await page.locator('#templateEmpty').isVisible(), true);
+    await page.locator('#resetTemplateFilters').click();
+    assert.equal(await page.locator('.template:visible').count(), 40);
+    await page.locator('#showNewTemplates').click();
+    assert.equal(await page.locator('.template:visible').count(), 24);
+    await page.locator('.template-visual:visible').last().click();
+    assert.equal(await page.locator('#previewTitle').textContent(), 'MẪU 40 / 40');
+    assert.equal(await page.locator('#previewName').textContent(), 'Sakura lời ước');
   } finally { await ctx.close(); }
 });
