@@ -1,5 +1,6 @@
 /* Atelier v2: rich stationery, layered previews and a recipient envelope. */
 :root{--paper:#f8f4eb;--wine:#65363d}
+.invitation-guest .site-header,.invitation-guest .site-footer,.invitation-guest .skip,.invitation-guest #studio{display:none!important}
 .hero{min-height:710px;grid-template-columns:1.03fr 1fr;gap:55px;padding-block:65px 75px}
 .hero h1{font-size:clamp(36px,3.9vw,57px);letter-spacing:-.045em}
 .hero h1 em{font-family:'Great Vibes',cursive;font-size:1.28em;letter-spacing:0;font-weight:400}

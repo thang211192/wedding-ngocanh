@@ -28,10 +28,12 @@
     ['trang-ngoc','formal'],['tim-khoi','romantic'],['dat-nung','minimal'],['den-vang','formal'],
     ['xanh-suong','minimal'],['hoa-moc','romantic'],['hong-dao','romantic'],['xanh-reu','minimal']
   ];
-  let loading;
-  function load() {
-    if (!loading) loading=Promise.all([...new Set(specs.map(t=>t.art))].map(key=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>reject(Error('Không tải được họa tiết '+key));img.src=new URL(key+'-v2.webp',root).href;})));
-    return loading;
+  const loading = new Map();
+  function load(keys = [...new Set(specs.map(t=>t.art))]) {
+    return Promise.all(keys.map(key=>{
+      if(!loading.has(key))loading.set(key,new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>{loading.delete(key);reject(Error('Không tải được họa tiết '+key));};img.src=new URL(key+'-v2.webp',root).href;}));
+      return loading.get(key);
+    }));
   }
   function getTemplates(){return specs.map((t,i)=>({...t,id:t.id||legacy[i][0],category:t.category||legacy[i][1],isNew:i>=legacy.length}));}
   const SERIF='"Playfair Display"',SCRIPT='"Great Vibes"',SANS='"Be Vietnam Pro"';
