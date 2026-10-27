@@ -75,6 +75,7 @@ test('liên kết mở được thiệp riêng ở trình duyệt khác; tải �
     await page.locator('#copyInviteLink').click();
     await page.waitForFunction(() => document.querySelector('#previewStatus').textContent.includes('Đã sao chép'));
     const url = await page.evaluate(() => navigator.clipboard.readText());
+    assert.equal(new URL(url).searchParams.get('v'), 'og1');
     const guest = await recipient.newPage();
     await guest.setViewportSize({ width: 390, height: 844 });
     await guest.goto(url);
@@ -158,5 +159,26 @@ test('tìm kiếm không dấu, theo số mẫu và kết hợp chủ đề khô
     await page.locator('.template-visual:visible').last().click();
     assert.equal(await page.locator('#previewTitle').textContent(), 'MẪU 40 / 40');
     assert.equal(await page.locator('#previewName').textContent(), 'Sakura lời ước');
+  } finally { await ctx.close(); }
+});
+
+test('ảnh đại diện Open Graph đọc được khi không chạy JavaScript', async () => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false, userAgent: 'facebookexternalhit/1.1' });
+  try {
+    const page = await ctx.newPage();
+    const response = await page.goto(server.origin + '/thiep-cuoi.html?v=og1');
+    assert.equal(response.status(), 200);
+    assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'), 'Thiệp mời cưới · Văn Thắng & Ngọc Anh');
+    assert.equal(await page.locator('meta[property="og:image:width"]').getAttribute('content'), '1200');
+    assert.equal(await page.locator('meta[property="og:image:height"]').getAttribute('content'), '630');
+    assert.equal(await page.locator('meta[name="twitter:card"]').getAttribute('content'), 'summary_large_image');
+    const imageURL = new URL(await page.locator('meta[property="og:image"]').getAttribute('content'));
+    assert.equal(imageURL.protocol, 'https:');
+    assert.equal(imageURL.hostname, 'thang-ngocanh.netlify.app');
+    const imageResponse = await page.goto(server.origin + imageURL.pathname);
+    assert.equal(imageResponse.status(), 200);
+    assert.match(imageResponse.headers()['content-type'], /image\/jpeg/);
+    const dimensions = await page.locator('img').evaluate(img => ({ width: img.naturalWidth, height: img.naturalHeight }));
+    assert.deepEqual(dimensions, { width: 1200, height: 630 });
   } finally { await ctx.close(); }
 });

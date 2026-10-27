@@ -16,6 +16,7 @@ const TYPES = {
   ".mjs": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
   ".txt": "text/plain; charset=utf-8",
+  ".jpg": "image/jpeg",
 };
 
 /** Mở server trên cổng ngẫu nhiên, trả về { origin, close }. */

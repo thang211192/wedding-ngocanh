@@ -114,3 +114,7 @@ Disallow: /
 # --- Mọi bot còn lại ---
 User-agent: *
 Disallow: /
+# Cho bot tạo ảnh xem trước đọc đúng trang thiệp và ảnh Open Graph.
+# Các bot bị chặn riêng ở trên vẫn áp dụng quy tắc riêng của chúng.
+Allow: /thiep-cuoi
+Allow: /assets/images/og/
