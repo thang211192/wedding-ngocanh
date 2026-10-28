@@ -29,9 +29,13 @@
     ['xanh-suong','minimal'],['hoa-moc','romantic'],['hong-dao','romantic'],['xanh-reu','minimal']
   ];
   const loading = new Map();
+  const imageFormat = (() => {
+    try { const canvas = document.createElement('canvas'); return canvas.toDataURL('image/webp').startsWith('data:image/webp') ? 'webp' : 'jpg'; }
+    catch { return 'jpg'; }
+  })();
   function load(keys = [...new Set(specs.map(t=>t.art))]) {
     return Promise.all(keys.map(key=>{
-      if(!loading.has(key))loading.set(key,new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>{loading.delete(key);reject(Error('Không tải được họa tiết '+key));};img.src=new URL(key+'-v2.webp',root).href;}));
+      if(!loading.has(key))loading.set(key,new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{images.set(key,img);resolve();};img.onerror=()=>{loading.delete(key);reject(Error('Không tải được họa tiết '+key));};img.src=new URL(`${key}-v2.${imageFormat}`,root).href;}));
       return loading.get(key);
     }));
   }

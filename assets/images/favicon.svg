@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Văn Thắng và Ngọc Anh</title>
+  <desc id="desc">Monogram T và A trên nền xanh ngọc</desc>
+  <defs>
+    <radialGradient id="paper" cx="30%" cy="20%" r="90%">
+      <stop offset="0" stop-color="#f3dfad"/>
+      <stop offset="1" stop-color="#bf9250"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="#2f5d50"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="url(#paper)" stroke-width="2"/>
+  <path d="M18 18h14M25 18v27M18 45h14" fill="none" stroke="#fff8e8" stroke-width="3" stroke-linecap="round"/>
+  <path d="m35 45 8-27 8 27M38 36h10" fill="none" stroke="#fff8e8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="5" fill="url(#paper)"/>
+  <path d="M29.5 32h5" stroke="#6d4c2a" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

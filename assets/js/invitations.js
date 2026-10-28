@@ -106,7 +106,7 @@
       $('copyInviteLink').addEventListener('click',()=>{if(!readyToSend($('previewStatus')))return;const url=new URL(location.href);url.search='?v=og1';url.hash='moi='+encodeURIComponent(JSON.stringify({template:selected.id,details:data}));copy(url.href,$('previewStatus'));});
     }
     try{await loadFonts();}catch{notify('Chưa tải đủ họa tiết hoặc font. Hãy tải lại trang để thiệp hiển thị đầy đủ.');fontsReady=true;}
-    if(guest)draw($('guestCanvas'),selected,data,900);else renderAll();
+    if(guest){$('coverNames').innerHTML=`<span class="cover-name-groom"></span><span class="cover-amp" aria-hidden="true">&amp;</span><span class="cover-name-bride"></span>`;$('coverNames').querySelector('.cover-name-groom').textContent=data.groom;$('coverNames').querySelector('.cover-name-bride').textContent=data.bride;draw($('guestCanvas'),selected,data,900);}else renderAll();
   }
   init();
 })();
