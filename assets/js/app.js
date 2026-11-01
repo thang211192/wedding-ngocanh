@@ -775,7 +775,10 @@
 
     var state = { area: 'all', kind: 'all', q: '', savedOnly: false };
 
-    var saved = store.get('eats', []);
+    // Keep the dining directory and the bridal-studio directory independent
+    // even though both reuse the same filtering UI.
+    var savedKey = document.body.classList.contains('bridal-page') ? 'bridalStudios' : 'eats';
+    var saved = store.get(savedKey, []);
     if (!Array.isArray(saved)) saved = [];
 
     // Chuỗi tìm kiếm bỏ dấu, tính sẵn một lần cho mỗi thẻ.
@@ -889,7 +892,7 @@
         if (!saved.length) { toast('Chưa lưu quán nào.'); return; }
         if (!window.confirm('Xoá danh sách quán đã lưu (' + saved.length + ' quán)?')) return;
         saved.length = 0;
-        store.set('eats', saved);
+        store.set(savedKey, saved);
         renderSaved();
         apply();
         toast('Đã xoá danh sách quán đã lưu.');
@@ -909,7 +912,7 @@
         } else {
           saved.splice(i, 1);
         }
-        store.set('eats', saved);
+        store.set(savedKey, saved);
         renderSaved();
         if (state.savedOnly) apply();
       });
