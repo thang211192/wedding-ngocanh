@@ -189,10 +189,12 @@
   }
 
   /* ---------------- 5. Ngày cưới → countdown + lộ trình ---------------- */
-  var DEFAULT_DATE = '2026-12-20';
+  var DEFAULT_DATE = '2027-01-01';
+  var PREVIOUS_DEFAULT_DATE = '2026-12-20';
 
   function getWeddingDate() {
     var saved = store.get('weddingDate', null);
+    if (saved === PREVIOUS_DEFAULT_DATE) saved = DEFAULT_DATE;
     return parseISO(saved) || parseISO(DEFAULT_DATE);
   }
 

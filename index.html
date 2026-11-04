@@ -178,8 +178,8 @@ document.documentElement.className += ' js';
       <div class="countdown__top">
         <span class="countdown__label" id="cdLabel">Đếm ngược tới ngày cưới</span>
         <div class="field-inline">
-          <label for="weddingDate">Ngày cưới dự kiến</label>
-          <input type="date" id="weddingDate" value="2026-12-20">
+          <label for="weddingDate">Ngày cưới chính thức</label>
+          <input type="date" id="weddingDate" value="2027-01-01">
         </div>
       </div>
 
@@ -195,9 +195,14 @@ document.documentElement.className += ' js';
         <span id="cdFull">—</span>
       </p>
 
+      <div class="note note--rose" style="margin-top:16px">
+        <svg class="ico" aria-hidden="true"><use href="#i-calendar-check"/></svg>
+        <span><strong>Hai mốc đã chốt:</strong> đăng ký kết hôn ngày <time datetime="2026-11-28">28/11/2026</time> · tổ chức đám cưới vào Tết Dương lịch, ngày <time datetime="2027-01-01">01/01/2027</time>.</span>
+      </div>
+
       <div class="note note--gold" id="cdAlert" style="margin-top:16px">
         <svg class="ico" aria-hidden="true"><use href="#i-alert"/></svg>
-        <span>Đổi ngày ở ô phía trên, toàn bộ mốc thời gian trong trang sẽ tự tính lại.</span>
+        <span>Ngày cưới đã chốt là <strong>01/01/2027</strong>. Nếu cần điều chỉnh ô phía trên, toàn bộ mốc thời gian trong trang sẽ tự tính lại.</span>
       </div>
 
       <div class="note note--danger" id="storageWarn" hidden style="margin-top:12px">
@@ -223,8 +228,8 @@ document.documentElement.className += ' js';
     <div class="grid grid--4" style="margin-bottom:32px">
       <div class="stat reveal">
         <span class="stat__k">1 · Thời điểm</span>
-        <span class="stat__v">Cuối 2026</span>
-        <p class="stat__d">Chốt tháng trước, ngày chính xác chờ xem tuổi. Cuối năm là chính vụ cưới ở quê — đội nấu cỗ có tiếng và dịch vụ rạp kín lịch rất sớm.</p>
+        <span class="stat__v">01/01/2027</span>
+        <p class="stat__d">Ngày cưới đã chốt vào Tết Dương lịch. Hai bạn đi đăng ký kết hôn ngày <strong>28/11/2026</strong>, trước lễ cưới 34 ngày.</p>
       </div>
       <div class="stat reveal">
         <span class="stat__k">2 · Số mâm mỗi bên</span>
@@ -631,7 +636,7 @@ document.documentElement.className += ' js';
                     <ol class="step__how">
                       <li>Lập nhóm Zalo, đặt tên rõ: <strong>“Cưới Thắng – Ngọc Anh”</strong>.</li>
                       <li>Thành viên: hai đứa và bố mẹ hai bên. Ai không dùng Zalo thì thêm anh chị ruột làm người truyền tin.</li>
-                      <li>Ghim ngay ba thứ lên đầu nhóm: <strong>link trang này</strong>, bốn quyết định gốc ở bước 2, và ngày cưới dự kiến.</li>
+                      <li>Ghim ngay ba thứ lên đầu nhóm: <strong>link trang này</strong>, bốn quyết định gốc ở bước 2, và ngày cưới chính thức <strong>01/01/2027</strong>.</li>
                       <li>Quy ước: mọi con số đã chốt đều phải nhắn vào nhóm. Nói miệng xong vẫn phải nhắn lại.</li>
                     </ol>
                     <p class="step__done"><b>Xong khi —</b> nhóm đã lập, đủ người, và đã ghim link trang này.</p>
@@ -663,16 +668,16 @@ document.documentElement.className += ' js';
                   <label class="step__tick"><input type="checkbox" data-step="s1-12"><span class="sr-only">Đánh dấu bước 12 giai đoạn 1 đã xong</span></label>
                   <div class="step__main">
                     <span class="step__n">Bước 12</span>
-                    <h4 class="step__title">Nhập ngày cưới dự kiến vào đầu trang này</h4>
+                    <h4 class="step__title">Ghi ngày cưới chính thức vào đầu trang này</h4>
                     <dl class="step__facts">
                       <div><dt>Ai làm</dt><dd>Một trong hai đứa</dd></div>
-                      <div><dt>Khi nào</dt><dd>Ngay khi có ngày dự kiến, kể cả chưa chắc chắn</dd></div>
+                      <div><dt>Khi nào</dt><dd>Đã chốt: 01/01/2027</dd></div>
                     </dl>
                     <p class="step__how-h">Làm thế nào</p>
                     <ol class="step__how">
-                      <li>Lên đầu trang, nhập ngày cưới dự kiến vào ô chọn ngày.</li>
+                      <li>Lên đầu trang, xác nhận ô chọn ngày đang là <strong>01/01/2027</strong>.</li>
                       <li>Toàn bộ mốc thời gian của 10 giai đoạn sẽ tự tính ngược theo ngày đó, và giai đoạn đang tới hạn được tô hồng.</li>
-                      <li>Chọn được ngày chính thức sau khi xem tuổi thì quay lại sửa — mọi thứ tự tính lại.</li>
+                      <li>Nếu hai gia đình đổi ngày, quay lại sửa tại đây — mọi mốc sẽ tự tính lại.</li>
                     </ol>
                     <p class="step__done"><b>Xong khi —</b> trang này hiện đúng số tuần còn lại và đánh dấu đúng giai đoạn hiện tại.</p>
                   </div>
@@ -2590,7 +2595,7 @@ document.documentElement.className += ' js';
                     <h4 class="step__title">Chuẩn bị hồ sơ đăng ký kết hôn</h4>
                     <dl class="step__facts">
                       <div><dt>Ai làm</dt><dd>Hai đứa</dd></div>
-                      <div><dt>Khi nào</dt><dd>Trước ngày cưới vài tuần</dd></div>
+                      <div><dt>Khi nào</dt><dd>Hoàn tất trước ngày 28/11/2026</dd></div>
                     </dl>
                     <p class="step__how-h">Làm thế nào</p>
                     <ol class="step__how">
@@ -2612,7 +2617,7 @@ document.documentElement.className += ' js';
                     <h4 class="step__title">Đi đăng ký kết hôn tại UBND xã</h4>
                     <dl class="step__facts">
                       <div><dt>Ai làm</dt><dd>Cả hai phải cùng có mặt</dd></div>
-                      <div><dt>Khi nào</dt><dd>Trước ngày cưới ít nhất 2 tuần</dd></div>
+                      <div><dt>Khi nào</dt><dd>Ngày 28/11/2026 (đã chốt)</dd></div>
                     </dl>
                     <p class="step__how-h">Làm thế nào</p>
                     <ol class="step__how">
@@ -6417,9 +6422,14 @@ document.documentElement.className += ' js';
       <h2 class="section__title">Đăng ký kết hôn &amp; giấy tờ sau cưới</h2>
       <p class="section__sub">
         Đám cưới là nghi lễ, đăng ký kết hôn mới là thứ có giá trị pháp lý.
-        Nên làm <strong>trước ngày cưới vài tuần</strong> để không vướng vào lúc bận nhất —
-        nhất là khi hai tuần cuối đã kín việc dựng rạp và lo cỗ.
+        Hai bạn đã chốt đi đăng ký vào <strong>28/11/2026</strong>, trước ngày cưới 34 ngày,
+        để không vướng vào giai đoạn bận dựng rạp và lo cỗ cuối năm.
       </p>
+    </div>
+
+    <div class="note note--rose reveal" style="margin-bottom:24px">
+      <svg class="ico" aria-hidden="true"><use href="#i-calendar-check"/></svg>
+      <span><strong>Lịch đã chốt:</strong> cùng đi đăng ký kết hôn tại UBND xã ngày <time datetime="2026-11-28">28/11/2026</time>; đám cưới tổ chức ngày <time datetime="2027-01-01">01/01/2027</time>.</span>
     </div>
 
     <div class="grid grid--2" style="align-items:start;margin-bottom:24px">

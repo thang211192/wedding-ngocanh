@@ -37,6 +37,18 @@ async function open() {
 
 const steps = (page) => page.locator("#lo-trinh .step input[data-step]");
 
+test("hiển thị đúng hai ngày đã chốt", async () => {
+  const { page, errors, close } = await open();
+  try {
+    assert.equal(await page.locator("#weddingDate").inputValue(), "2027-01-01");
+    assert.ok((await page.locator("body").textContent()).includes("28/11/2026"));
+    assert.ok((await page.locator("body").textContent()).includes("01/01/2027"));
+    assert.deepEqual(errors, []);
+  } finally {
+    await close();
+  }
+});
+
 describe("chi tiết từng bước", () => {
   test("mười giai đoạn đều có khối chi tiết, không giai đoạn nào rỗng", async () => {
     const { page, errors, close } = await open();
