@@ -374,6 +374,10 @@
       updateProgressBar($('.progress__bar', group), null, done, boxes.length);
       var counter = $('.steps__count', group);
       if (counter) counter.textContent = done + '/' + boxes.length + ' bước';
+      var checkAllBtn = $('[data-step-action="check-all"]', group);
+      var clearAllBtn = $('[data-step-action="clear-all"]', group);
+      if (checkAllBtn) checkAllBtn.disabled = done === boxes.length;
+      if (clearAllBtn) clearAllBtn.disabled = done === 0;
     });
 
     var done = all.filter(function (b) { return b.checked; }).length;
@@ -393,6 +397,42 @@
         if (b.checked) s[id] = 1; else delete s[id];
         store.set('steps', s);
         refreshSteps();
+      });
+    });
+
+    $$('[data-steps]').forEach(function (group) {
+      var body = $('.steps__body', group);
+      var progress = $('.steps__progress', group);
+      if (!body || $('[data-step-bulk]', group)) return;
+
+      var toolbar = document.createElement('div');
+      toolbar.className = 'steps__bulk';
+      toolbar.setAttribute('data-step-bulk', '');
+      toolbar.setAttribute('role', 'group');
+      toolbar.setAttribute('aria-label', 'Thao tác nhanh cho giai đoạn này');
+      toolbar.innerHTML = '<button class="btn btn--ghost btn--sm" type="button" data-step-action="check-all">Tích tất cả</button>'
+        + '<button class="btn btn--ghost btn--sm" type="button" data-step-action="clear-all">Bỏ tích tất cả</button>';
+      body.insertBefore(toolbar, progress || body.firstChild);
+
+      function setGroupChecked(checked) {
+        var groupBoxes = $$('input[type="checkbox"][data-step]', group);
+        var s = store.get('steps', {});
+        groupBoxes.forEach(function (b) {
+          var id = b.getAttribute('data-step');
+          b.checked = checked;
+          if (checked) s[id] = 1; else delete s[id];
+        });
+        store.set('steps', s);
+        refreshSteps();
+        var phase = $('.tl__phase', group.closest('.tl__card'));
+        toast((checked ? 'Đã tích tất cả bước · ' : 'Đã bỏ tích tất cả bước · ') + (phase ? phase.textContent : 'giai đoạn này'));
+      }
+
+      $('[data-step-action="check-all"]', toolbar).addEventListener('click', function () {
+        setGroupChecked(true);
+      });
+      $('[data-step-action="clear-all"]', toolbar).addEventListener('click', function () {
+        setGroupChecked(false);
       });
     });
 

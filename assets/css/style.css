@@ -508,6 +508,11 @@ input:focus-visible, select:focus-visible { border-color: var(--rose); outline: 
 .steps[open] .steps__chev { transform: rotate(180deg); }
 .steps__body { padding: var(--s-3) var(--s-4) var(--s-4); }
 .steps__progress { margin-bottom: var(--s-4); }
+.steps__bulk {
+  display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-3);
+}
+.steps__bulk .btn { flex: 1 1 150px; }
+.steps__bulk .btn:disabled { opacity: .45; cursor: not-allowed; }
 
 .step-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
 /* Màn hình nhỏ: ô tích nằm đè lên góc thẻ thay vì chiếm hẳn một cột. Khối bước

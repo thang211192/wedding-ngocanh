@@ -103,6 +103,32 @@ describe("chi tiết từng bước", () => {
     }
   });
 
+  test("tích tất cả và bỏ tích chỉ tác động trong từng giai đoạn", async () => {
+    const { page, close } = await open();
+    try {
+      const first = page.locator('[data-steps="gd1"]');
+      const second = page.locator('[data-steps="gd2"]');
+      await first.locator("summary").click();
+
+      await first.getByRole("button", { name: "Tích tất cả", exact: true }).click();
+      const firstTotal = await first.locator("input[data-step]").count();
+      assert.equal(await first.locator("input[data-step]:checked").count(), firstTotal);
+      assert.equal(await second.locator("input[data-step]:checked").count(), 0);
+      assert.equal(await first.locator(".steps__count").textContent(), `${firstTotal}/${firstTotal} bước`);
+
+      await page.reload();
+      assert.equal(await first.locator("input[data-step]:checked").count(), firstTotal);
+      assert.equal(await second.locator("input[data-step]:checked").count(), 0);
+
+      await first.locator("summary").click();
+      await first.getByRole("button", { name: "Bỏ tích tất cả", exact: true }).click();
+      assert.equal(await first.locator("input[data-step]:checked").count(), 0);
+      assert.equal(await first.locator(".steps__count").textContent(), `0/${firstTotal} bước`);
+    } finally {
+      await close();
+    }
+  });
+
   test("tiến độ các bước và checklist 114 việc không ghi đè nhau", async () => {
     const { page, close } = await open();
     try {
