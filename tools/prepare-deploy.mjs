@@ -16,6 +16,7 @@ if (OUT !== join(ROOT, "_site")) {
 const publicFiles = [
   "index.html",
   "an-uong.html",
+  "chup-anh-cuoi.html",
   "phong-cuoi.html",
   "nhan-cuoi.html",
   "thiep-cuoi.html",
