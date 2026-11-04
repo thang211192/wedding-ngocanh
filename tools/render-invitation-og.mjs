@@ -1,6 +1,6 @@
 // Render a reusable 1200 × 630 JPEG preview using the site's local fonts/artwork.
 // Run locally: node tools/render-invitation-og.mjs
-// Commit the output; Netlify's static deployment does not need Playwright.
+// Commit the output; Cloudflare's static deployment does not need Playwright.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { startServer } from '../tests/server.mjs';

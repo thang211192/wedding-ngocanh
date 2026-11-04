@@ -19,7 +19,7 @@ Desktop.ini
 .vscode/
 .idea/
 
-# Thư mục publish do Netlify tạo khi build
+# Thư mục static assets được dựng để Cloudflare publish
 _site/
 
 # wrangler files

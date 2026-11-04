@@ -2,8 +2,8 @@
 //
 //   node tools/build.mjs      (hoặc: npm run build)
 //
-// an-uong.html được commit vào repo như một file đã dựng — Netlify chỉ `cp`,
-// không chạy script này. Sửa dữ liệu xong thì chạy lại rồi commit cả hai.
+// an-uong.html được commit vào repo như một file đã dựng. Cloudflare chạy script
+// này khi build; sửa dữ liệu xong vẫn chạy lại và commit cả dữ liệu lẫn HTML.
 //
 // Sprite icon được rút thẳng từ index.html để hai trang không bao giờ lệch bộ
 // icon. Không tách ra file .svg dùng chung vì `<use href="file.svg#id">` không

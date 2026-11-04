@@ -174,7 +174,7 @@ test('ảnh đại diện Open Graph đọc được khi không chạy JavaScrip
     assert.equal(await page.locator('meta[name="twitter:card"]').getAttribute('content'), 'summary_large_image');
     const imageURL = new URL(await page.locator('meta[property="og:image"]').getAttribute('content'));
     assert.equal(imageURL.protocol, 'https:');
-    assert.equal(imageURL.hostname, 'thang-ngocanh.netlify.app');
+    assert.equal(imageURL.hostname, 'wedding-ngocanh.thang211192.workers.dev');
     const imageResponse = await page.goto(server.origin + imageURL.pathname);
     assert.equal(imageResponse.status(), 200);
     assert.match(imageResponse.headers()['content-type'], /image\/jpeg/);
