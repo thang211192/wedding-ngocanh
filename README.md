@@ -31,7 +31,7 @@ python -m http.server 8000
 
 ```bash
 npm install          # lần đầu
-npm run build        # tools/data.mjs  ->  an-uong.html
+npm run build        # tools/data.mjs -> an-uong.html, sau đó dựng _site/
 ```
 
 Thêm hoặc sửa quán thì vào `tools/data.mjs`. Một quy tắc bắt buộc với trường
@@ -41,8 +41,8 @@ chế độ tra địa chỉ và trả về pin "Building" thay vì thẻ quán.
 Google Maps ghi, không phải tên gọi dân dã. Mở thử chuỗi tra trên Google Maps
 trước khi commit.
 
-Nhớ commit cả `tools/data.mjs` lẫn `an-uong.html` — Netlify chỉ copy file tĩnh,
-không chạy script build.
+Nhớ commit cả `tools/data.mjs` lẫn `an-uong.html` để file đã sinh trong repo luôn đồng bộ.
+Mọi file `.html` ở thư mục gốc được tự động chép vào `_site/`; không đặt HTML riêng tư ở thư mục gốc.
 
 ## Chạy test
 

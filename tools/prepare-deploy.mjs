@@ -2,7 +2,7 @@
 // Personal notes, repository metadata, tests, and tooling are intentionally
 // excluded from the generated _site directory.
 
-import { cp, mkdir, rm } from "node:fs/promises";
+import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,15 +13,14 @@ if (OUT !== join(ROOT, "_site")) {
   throw new Error(`Refusing to clean unexpected output path: ${OUT}`);
 }
 
-const publicFiles = [
-  "index.html",
-  "an-uong.html",
-  "chup-anh-cuoi.html",
-  "phong-cuoi.html",
-  "nhan-cuoi.html",
-  "thiep-cuoi.html",
-  "robots.txt",
-];
+// Every root-level HTML file is a public page. Keeping this automatic prevents
+// newly added pages from being omitted from Cloudflare's _site deployment.
+// HTML files below docs/ or any other subdirectory remain private.
+const publicFiles = (await readdir(ROOT, { withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name.endsWith(".html"))
+  .map((entry) => entry.name)
+  .sort();
+publicFiles.push("robots.txt");
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });

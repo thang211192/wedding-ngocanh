@@ -20,3 +20,10 @@ Giữ nguyên năm nhãn chuẩn: `needs-triage`, `needs-info`, `ready-for-agent
 
 Single-context: `CONTEXT.md` và `docs/adr/` đặt ở gốc repo.
 See `docs/agents/domain.md`.
+
+## Deployment
+
+- Cloudflare và các static host chỉ được publish thư mục `_site`.
+- Mỗi khi sửa hoặc thêm trang HTML, chạy `npm run build` và xác nhận trang có trong `_site`.
+- `tools/prepare-deploy.mjs` tự động chép mọi file `.html` ở thư mục gốc vào `_site`; không đặt HTML riêng tư ở thư mục gốc.
+- Không publish trực tiếp gốc repository vì `docs/` chứa nội dung cá nhân.

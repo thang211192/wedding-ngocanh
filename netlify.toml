@@ -22,9 +22,9 @@
   # Dòng này ghi đè trường "Base directory" trên giao diện Netlify.
   base = ""
 
-  # Chỉ chép đúng những gì cần công khai.
-  # Thêm file nào cần lên web thì phải thêm vào đây, nếu không nó sẽ không được deploy.
-  command = "rm -rf _site && mkdir -p _site && cp index.html an-uong.html chup-anh-cuoi.html phong-cuoi.html nhan-cuoi.html thiep-cuoi.html robots.txt _site/ && cp -r assets _site/"
+  # Dùng chung quy trình với Cloudflare: mọi file HTML ở gốc được đưa vào _site,
+  # còn docs/, README và các file nội bộ không được publish.
+  command = "npm run build"
 
   # Thư mục được đẩy lên CDN.
   publish = "_site"
