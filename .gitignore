@@ -21,3 +21,10 @@ Desktop.ini
 
 # Thư mục publish do Netlify tạo khi build
 _site/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
